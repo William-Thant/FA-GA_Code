@@ -165,6 +165,62 @@ async function sendEReceipt(email, orderId, items, subtotal, tax, total) {
 }
 
 /**
+ * Send OTP email for registration verification
+ * @param {string} email - Customer email address
+ * @param {string} otp - 6 digit OTP
+ * @param {number} ttlMinutes - OTP expiry in minutes
+ */
+async function sendOtpEmail(email, otp, ttlMinutes = 5) {
+    try {
+        if (!process.env.EMAIL_USER) {
+            console.warn('Email service not configured. Skipping OTP send.');
+            return { success: false, message: 'Email service not configured' };
+        }
+
+        const htmlBody = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: 'Arial', sans-serif; color: #ffffff; background-color: #0a0a0a; margin: 0; padding: 0; }
+                    .container { max-width: 600px; margin: 30px auto; background: #111; border: 2px solid #ff3333; border-radius: 12px; overflow: hidden; }
+                    .header { background: #ff3333; color: white; padding: 24px; text-align: center; }
+                    .content { padding: 24px; }
+                    .otp { font-size: 2rem; font-weight: 900; letter-spacing: 6px; color: #ffd700; text-align: center; margin: 20px 0; }
+                    .note { color: #aaa; font-size: 0.95rem; text-align: center; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h2>Verify Your Email</h2>
+                    </div>
+                    <div class="content">
+                        <p>Use the following 6‑digit OTP to complete your registration:</p>
+                        <div class="otp">${otp}</div>
+                        <p class="note">This code expires in ${ttlMinutes} minutes. If you did not request this, you can ignore this email.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const result = await transporter.sendMail({
+            from: `"Isaac's Cardealership" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Your OTP Code',
+            html: htmlBody
+        });
+
+        return { success: true, message: 'OTP sent', result };
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        return { success: false, message: 'Failed to send OTP', error };
+    }
+}
+
+/**
  * Send refund notification to the customer
  * @param {string} email - Customer email address
  * @param {string} orderId - Order ID
@@ -322,4 +378,4 @@ function verifyTransporter() {
     return transporter.verify();
 }
 
-module.exports = { sendEReceipt, sendRefundNotification, sendGiftCard, verifyTransporter };
+module.exports = { sendEReceipt, sendRefundNotification, sendGiftCard, sendOtpEmail, verifyTransporter };

@@ -185,9 +185,11 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', validateRegistration, (req, res) => {
-
     const { firstName, lastName, email, password, address, contact } = req.body;
-    const username = `${firstName} ${lastName}`;
+    const rawUsername = `${firstName} ${lastName}`.trim();
+    const username = (rawUsername || firstName || 'User').substring(0, 20);
+    const safeContact = contact ? String(contact).trim().substring(0, 10) : '';
+    const safeAddress = address ? String(address).trim().substring(0, 255) : '';
     const role = 'user'; // Default all new registrations to user role
 
     // Check if email already exists
@@ -206,26 +208,135 @@ app.post('/register', validateRegistration, (req, res) => {
         }
 
         // Hash password with bcrypt before storing
-        bcrypt.hash(password, 10, (hashErr, hash) => {
+        bcrypt.hash(password, 10, async (hashErr, hash) => {
             if (hashErr) {
                 console.error('Error hashing password:', hashErr);
                 req.flash('error', 'Server error');
                 req.flash('formData', req.body);
                 return res.redirect('/register');
             }
-            const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, ?, ?, ?, ?)';
-            connection.query(sql, [username, email, hash, address || '', contact || '', role], (err, result) => {
+
+            const otp = String(Math.floor(100000 + Math.random() * 900000));
+            const now = Date.now();
+            const expiresAt = now + (5 * 60 * 1000);
+            const resendAvailableAt = now + (30 * 1000);
+
+            req.session.pendingRegistration = {
+                username,
+                email,
+                passwordHash: hash,
+                address: safeAddress,
+                contact: safeContact,
+                role,
+                otp,
+                expiresAt,
+                resendAvailableAt,
+                attempts: 0
+            };
+
+            const emailResult = await emailService.sendOtpEmail(email, otp, 5);
+            if (!emailResult.success) {
+                req.flash('error', 'Failed to send OTP email. Please try again.');
+                req.flash('formData', req.body);
+                return res.redirect('/register');
+            }
+
+            return res.redirect('/register/verify');
+        });
+    });
+});
+
+app.get('/register/verify', (req, res) => {
+    const pending = req.session.pendingRegistration;
+    if (!pending) {
+        req.flash('error', 'No pending registration found. Please register again.');
+        return res.redirect('/register');
+    }
+
+    res.render('auth/verify-otp', {
+        email: pending.email,
+        expiresAt: pending.expiresAt,
+        resendAvailableAt: pending.resendAvailableAt,
+        messages: { error: req.flash('error'), success: req.flash('success') }
+    });
+});
+
+app.post('/register/verify', (req, res) => {
+    const { otp } = req.body;
+    const pending = req.session.pendingRegistration;
+
+    if (!pending) {
+        req.flash('error', 'No pending registration found. Please register again.');
+        return res.redirect('/register');
+    }
+
+    if (Date.now() > pending.expiresAt) {
+        req.session.pendingRegistration = null;
+        req.flash('error', 'OTP expired. Please register again.');
+        return res.redirect('/register');
+    }
+
+    if (!otp || String(otp).trim() !== String(pending.otp)) {
+        pending.attempts += 1;
+        req.flash('error', 'Invalid OTP. Please try again.');
+        return res.redirect('/register/verify');
+    }
+
+    // Check if email already exists (race condition guard)
+    connection.query('SELECT id FROM users WHERE email = ?', [pending.email], (checkErr, existingUsers) => {
+        if (checkErr) {
+            console.error('Error checking email:', checkErr);
+            req.flash('error', 'Server error');
+            return res.redirect('/register/verify');
+        }
+
+        if (existingUsers.length > 0) {
+            req.session.pendingRegistration = null;
+            req.flash('error', 'Email already registered. Please login.');
+            return res.redirect('/login');
+        }
+
+        const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, ?, ?, ?, ?)';
+        connection.query(
+            sql,
+            [pending.username, pending.email, pending.passwordHash, pending.address, pending.contact, pending.role],
+            (err) => {
                 if (err) {
                     console.error(err);
                     req.flash('error', 'Could not register user');
-                    req.flash('formData', req.body);
-                    return res.redirect('/register');
+                    return res.redirect('/register/verify');
                 }
+
+                req.session.pendingRegistration = null;
                 req.flash('success', 'Registration successful! Please log in.');
-                res.redirect('/login');
-            });
-        });
+                return res.redirect('/login');
+            }
+        );
     });
+});
+
+app.post('/register/resend-otp', async (req, res) => {
+    const pending = req.session.pendingRegistration;
+    if (!pending) {
+        return res.status(400).json({ success: false, message: 'No pending registration found.' });
+    }
+
+    const now = Date.now();
+    if (now < pending.resendAvailableAt) {
+        return res.status(429).json({ success: false, message: 'Please wait before resending OTP.' });
+    }
+
+    const newOtp = String(Math.floor(100000 + Math.random() * 900000));
+    pending.otp = newOtp;
+    pending.expiresAt = now + (5 * 60 * 1000);
+    pending.resendAvailableAt = now + (30 * 1000);
+
+    const emailResult = await emailService.sendOtpEmail(pending.email, newOtp, 5);
+    if (!emailResult.success) {
+        return res.status(500).json({ success: false, message: 'Failed to resend OTP.' });
+    }
+
+    return res.json({ success: true, resendAvailableAt: pending.resendAvailableAt });
 });
 
 // Authentication routes (use merged UserController)

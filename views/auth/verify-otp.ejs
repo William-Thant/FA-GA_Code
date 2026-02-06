@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - Isaac's Cardealership</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      min-height: 100vh;
+      color: #ffffff;
+    }
+    .verify-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #333;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .verify-header {
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 60%, #ff3333 100%);
+      border-bottom: 3px solid #ff3333;
+      padding: 24px 28px;
+    }
+    .verify-header h3 {
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .verify-body {
+      padding: 28px;
+    }
+    .otp-input {
+      letter-spacing: 10px;
+      font-weight: 800;
+      text-align: center;
+      font-size: 1.5rem;
+      background: #0f0f0f;
+      color: #ffd700;
+      border: 2px solid #333;
+    }
+    .otp-input:focus {
+      border-color: #ff3333;
+      box-shadow: 0 0 0 0.2rem rgba(255, 51, 51, 0.25);
+      color: #ffd700;
+      background: #0f0f0f;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      border-color: #cc0000;
+    }
+    .btn-outline-secondary {
+      border-color: #666;
+      color: #ddd;
+    }
+    .btn-outline-secondary:disabled {
+      border-color: #444;
+      color: #777;
+    }
+    .helper-text {
+      color: #a8a8a8;
+    }
+    .email-pill {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 51, 51, 0.15);
+      border: 1px solid #ff3333;
+      color: #ffd700;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="verify-card">
+          <div class="verify-header">
+            <h3><i class="fas fa-shield-check"></i> Verify Your Email</h3>
+          </div>
+          <div class="verify-body">
+            <p class="helper-text mb-2">We sent a 6‑digit OTP to:</p>
+            <div class="email-pill mb-3"><%= email %></div>
+
+            <% if (messages && messages.error && messages.error.length) { %>
+              <div class="alert alert-danger"><%= messages.error.join ? messages.error.join(', ') : messages.error %></div>
+            <% } %>
+            <% if (messages && messages.success && messages.success.length) { %>
+              <div class="alert alert-success"><%= messages.success.join ? messages.success.join(', ') : messages.success %></div>
+            <% } %>
+
+            <form method="POST" action="/register/verify">
+              <div class="mb-3">
+                <label for="otp" class="form-label">OTP Code</label>
+                <input type="text" id="otp" name="otp" class="form-control otp-input" maxlength="6" inputmode="numeric" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-check-circle"></i> Verify
+              </button>
+            </form>
+
+            <div class="mt-3 text-center">
+              <button id="resendBtn" class="btn btn-outline-secondary" disabled>
+                Resend OTP (<span id="countdown">30</span>s)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-center mt-3 helper-text">OTP expires in 5 minutes.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const resendBtn = document.getElementById('resendBtn');
+    const countdownEl = document.getElementById('countdown');
+    let resendAvailableAt = <%= resendAvailableAt %>;
+
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = Math.max(0, Math.ceil((resendAvailableAt - now) / 1000));
+      countdownEl.textContent = diff;
+      if (diff <= 0) {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend OTP';
+      } else {
+        resendBtn.disabled = true;
+      }
+    }
+
+    resendBtn.addEventListener('click', async () => {
+      resendBtn.disabled = true;
+      try {
+        const res = await fetch('/register/resend-otp', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (data.success) {
+          resendAvailableAt = data.resendAvailableAt;
+          resendBtn.textContent = 'Resend OTP';
+          updateCountdown();
+        } else {
+          alert(data.message || 'Failed to resend OTP');
+        }
+      } catch (e) {
+        alert('Failed to resend OTP');
+      }
+    });
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>

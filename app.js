@@ -1780,9 +1780,11 @@ app.post('/api/paypal/capture-order', checkAuthenticated, async (req, res) => {
         discountAmount = appliedDiscount.amount;
       }
       
-      const taxableAmount = subtotal - discountAmount;
-      const tax = taxableAmount * 0.1;
-      const total = taxableAmount + tax;
+    const discountedSubtotal = subtotal - discountAmount;
+    const platformFee = discountedSubtotal * 0.1;
+    const subtotalWithFee = discountedSubtotal + platformFee;
+    const tax = subtotalWithFee * 0.1;
+    const total = subtotalWithFee + tax;
 
       // Check wallet balance and calculate wallet usage
       Wallet.getBalance(req.session.user.userId, async (walletErr, walletBalance) => {
@@ -1839,7 +1841,7 @@ app.post('/api/paypal/capture-order', checkAuthenticated, async (req, res) => {
                 const orderId = 'ORD-' + Date.now();
                 req.session.lastOrder = {
                   items: cart,
-                  subtotal: taxableAmount,
+                  subtotal: discountedSubtotal,
                   discount: discountAmount,
                   discountCode: appliedDiscount ? appliedDiscount.code : null,
                   tax: tax,
@@ -1863,7 +1865,7 @@ app.post('/api/paypal/capture-order', checkAuthenticated, async (req, res) => {
                 
                 // Save order to database
                 const orderSql = 'INSERT INTO orders (orderId, userId, subtotal, tax, total, orderDate, paymentProvider, paymentReference, seller_earnings, admin_commission) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                conn.query(orderSql, [orderId, req.session.user.userId, taxableAmount, tax, total, new Date(), 'PayPal', captureId, sellerEarnings, adminCommission], (orderErr) => {
+                conn.query(orderSql, [orderId, req.session.user.userId, discountedSubtotal, tax, total, new Date(), 'PayPal', captureId, sellerEarnings, adminCommission], (orderErr) => {
                   if (orderErr) {
                     console.error('Error saving order:', orderErr);
                   } else {
@@ -1887,7 +1889,7 @@ app.post('/api/paypal/capture-order', checkAuthenticated, async (req, res) => {
                 
                 // Send email receipt
                 const userEmail = req.session.user.email;
-                emailService.sendEReceipt(userEmail, orderId, cart, taxableAmount, tax, total)
+                emailService.sendEReceipt(userEmail, orderId, cart, discountedSubtotal, tax, total)
                   .then(result => {
                     if (result.success) {
                       console.log('Receipt sent successfully to:', userEmail);
@@ -2064,9 +2066,11 @@ app.post('/api/stripe/confirm-payment', checkAuthenticated, async (req, res) => 
         discountAmount = appliedDiscount.amount;
       }
       
-      const taxableAmount = subtotal - discountAmount;
-      const tax = taxableAmount * 0.1;
-      const total = taxableAmount + tax;
+    const discountedSubtotal = subtotal - discountAmount;
+    const platformFee = discountedSubtotal * 0.1;
+    const subtotalWithFee = discountedSubtotal + platformFee;
+    const tax = subtotalWithFee * 0.1;
+    const total = subtotalWithFee + tax;
 
       // Use a pooled connection and run a transaction
       connection.getConnection((getErr, conn) => {
@@ -2111,7 +2115,7 @@ app.post('/api/stripe/confirm-payment', checkAuthenticated, async (req, res) => 
                 const orderId = 'ORD-' + Date.now();
                 req.session.lastOrder = {
                   items: cart,
-                  subtotal: taxableAmount,
+                  subtotal: discountedSubtotal,
                   discount: discountAmount,
                   discountCode: appliedDiscount ? appliedDiscount.code : null,
                   tax: tax,
@@ -2135,7 +2139,7 @@ app.post('/api/stripe/confirm-payment', checkAuthenticated, async (req, res) => 
                 
                 // Save order to database
                 const orderSql = 'INSERT INTO orders (orderId, userId, subtotal, tax, total, orderDate, paymentProvider, paymentReference, seller_earnings, admin_commission) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                conn.query(orderSql, [orderId, req.session.user.userId, taxableAmount, tax, total, new Date(), 'Stripe', paymentIntentId, sellerEarnings, adminCommission], (orderErr) => {
+                conn.query(orderSql, [orderId, req.session.user.userId, discountedSubtotal, tax, total, new Date(), 'Stripe', paymentIntentId, sellerEarnings, adminCommission], (orderErr) => {
                   if (orderErr) {
                     console.error('Error saving order:', orderErr);
                   } else {
@@ -2159,7 +2163,7 @@ app.post('/api/stripe/confirm-payment', checkAuthenticated, async (req, res) => 
                 
                 // Send email receipt
                 const userEmail = req.session.user.email;
-                emailService.sendEReceipt(userEmail, orderId, cart, taxableAmount, tax, total)
+                emailService.sendEReceipt(userEmail, orderId, cart, discountedSubtotal, tax, total)
                   .then(result => {
                     if (result.success) {
                       console.log('Receipt sent successfully to:', userEmail);
@@ -2333,8 +2337,10 @@ app.get("/nets-qr/success", checkAuthenticated, (req, res) => {
     }
     
     const discountedSubtotal = subtotal - discountAmount;
-    const tax = discountedSubtotal * 0.1;
-    const total = discountedSubtotal + tax;
+    const platformFee = discountedSubtotal * 0.1;
+    const subtotalWithFee = discountedSubtotal + platformFee;
+    const tax = subtotalWithFee * 0.1;
+    const total = subtotalWithFee + tax;
 
     // Use a pooled connection and run a transaction
     connection.getConnection((getErr, conn) => {

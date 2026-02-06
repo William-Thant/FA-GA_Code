@@ -292,10 +292,19 @@
         </div>
 
         <div class="summary-section">
+          <% const platformFee = Number(order.subtotal) * 0.10; %>
+          <% const expectedTotal = Number(order.subtotal) + Number(order.tax) + platformFee; %>
+          <% const showPlatformFee = Math.abs(expectedTotal - Number(order.total)) <= 0.01; %>
           <div class="summary-row">
             <span>Subtotal:</span>
             <span>$<%= Number(order.subtotal).toFixed(2) %></span>
           </div>
+          <% if (showPlatformFee) { %>
+          <div class="summary-row">
+            <span>Platform Fee (10%):</span>
+            <span>$<%= platformFee.toFixed(2) %></span>
+          </div>
+          <% } %>
           <div class="summary-row">
             <span>Tax:</span>
             <span>$<%= Number(order.tax).toFixed(2) %></span>

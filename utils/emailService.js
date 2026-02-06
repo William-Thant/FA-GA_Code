@@ -37,6 +37,10 @@ async function sendEReceipt(email, orderId, items, subtotal, tax, total) {
             </tr>
         `).join('');
 
+        const platformFee = subtotal * 0.1;
+        const expectedTotalWithFee = subtotal + tax + platformFee;
+        const showPlatformFee = Math.abs(expectedTotalWithFee - total) <= 0.01;
+
         const htmlBody = `
             <!DOCTYPE html>
             <html>
@@ -111,6 +115,12 @@ async function sendEReceipt(email, orderId, items, subtotal, tax, total) {
                                 <span>Subtotal:</span>
                                 <span>$${subtotal.toFixed(2)}</span>
                             </div>
+                            ${showPlatformFee ? `
+                            <div class="summary-row">
+                                <span>Platform Fee (10%):</span>
+                                <span>$${platformFee.toFixed(2)}</span>
+                            </div>
+                            ` : ''}
                             <div class="summary-row">
                                 <span>Tax (10%):</span>
                                 <span>$${tax.toFixed(2)}</span>

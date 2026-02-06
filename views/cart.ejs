@@ -546,10 +546,11 @@ document.addEventListener('DOMContentLoaded', function () {
           <% if (appliedDiscount) { %>
             <% discountAmount = appliedDiscount.amount; %>
           <% } %>
-          <% const taxableAmount = subtotal - discountAmount; %>
-          <% const tax = taxableAmount * 0.1; %>
-          <% const commission = taxableAmount * 0.1; %>
-          <% const total = taxableAmount + tax + commission; %>
+          <% const discountedSubtotal = subtotal - discountAmount; %>
+          <% const commission = discountedSubtotal * 0.1; %>
+          <% const subtotalWithFee = discountedSubtotal + commission; %>
+          <% const tax = subtotalWithFee * 0.1; %>
+          <% const total = subtotalWithFee + tax; %>
           
           <div class="summary-row">
             <span>Subtotal:</span>

@@ -1,0 +1,288 @@
+<style>
+  .modern-navbar {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    padding: 1rem 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    border-bottom: 3px solid #ff3333;
+    position: relative;
+    z-index: 1000;
+  }
+  .modern-navbar .navbar-brand {
+    color: white !important;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .modern-navbar .navbar-brand:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+  }
+  .modern-navbar .navbar-brand i {
+    font-size: 2rem;
+    color: #ff3333;
+    filter: drop-shadow(0 0 10px rgba(255, 51, 51, 0.5));
+  }
+  .modern-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 600;
+    padding: 0.7rem 1.3rem !important;
+    margin: 0 0.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .modern-navbar .nav-link:hover {
+    background: rgba(255, 51, 51, 0.2);
+    color: #ff3333 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 51, 51, 0.3);
+  }
+  .modern-navbar .nav-link.active {
+    background: rgba(255, 51, 51, 0.3);
+    color: white !important;
+  }
+  .modern-navbar .nav-link i {
+    font-size: 1.2rem;
+  }
+  .modern-navbar .navbar-toggler {
+    border: 2px solid #ff3333;
+    padding: 0.5rem 0.7rem;
+    border-radius: 8px;
+  }
+  .modern-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 51, 51, 0.5);
+  }
+  .modern-navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 51, 51, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+  .cart-badge {
+    background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    margin-left: 0.4rem;
+    box-shadow: 0 2px 8px rgba(255, 51, 51, 0.5);
+  }
+  .modern-navbar .dropdown-menu {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    z-index: 1050;
+  }
+  .modern-navbar .dropdown-item {
+    color: #e8e8e8;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .modern-navbar .dropdown-item:hover {
+    background: rgba(255, 51, 51, 0.25);
+    color: white;
+    transform: translateX(5px);
+  }
+  .modern-navbar .dropdown-item i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    color: #ff3333;
+  }
+  .modern-navbar .dropdown-item:hover i {
+    color: white;
+  }
+  .modern-navbar .dropdown-toggle::after {
+    margin-left: 0.5rem;
+  }
+  .user-section {
+    background: rgba(255, 51, 51, 0.1);
+    border: 1px solid rgba(255, 51, 51, 0.3);
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s ease;
+  }
+  .user-section:hover {
+    background: rgba(255, 51, 51, 0.2);
+    border-color: rgba(255, 51, 51, 0.5);
+  }
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff3333, #cc0000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 0 15px rgba(255, 51, 51, 0.4);
+  }
+  .dropdown-divider {
+    border-color: #333 !important;
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg modern-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-shopping-cart"></i>
+      <span>Isaac's Cardealership</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link" href="/">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        
+        <% if (!user) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Login</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/register">
+              <i class="fas fa-user-plus"></i>
+              <span>Register</span>
+            </a>
+          </li>
+          
+        <% } else if (user.role === 'admin') { %>
+          <!-- Admin Navigation -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-tools"></i>
+              <span>Admin</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/admin/dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+              </a></li>
+              <li><a class="dropdown-item" href="/admin/analytics">
+                <i class="fas fa-chart-bar"></i> Analytics
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/inventory">
+                <i class="fas fa-warehouse"></i> Inventory
+              </a></li>
+              <li><a class="dropdown-item" href="/admin/support">
+                <i class="fas fa-ticket-alt"></i> Support
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/admin/sellers">
+                <i class="fas fa-user-tie"></i> Manage Sellers
+              </a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/settings">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle user-section" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+              <span><%= user.name %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a></li>
+            </ul>
+          </li>
+          
+        <% } else { %>
+          <!-- User Navigation -->
+          <li class="nav-item">
+            <a class="nav-link" href="/shop">
+              <i class="fas fa-car"></i>
+              <span>Browse</span>
+            </a>
+          </li>
+          
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle"></i>
+              <span>My Account</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <% if (user.is_seller && user.seller_status === 'approved') { %>
+              <li><a class="dropdown-item" href="/seller/dashboard">
+                <i class="fas fa-store"></i> My Store
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <% } %>
+              <li><a class="dropdown-item" href="/orders">
+                <i class="fas fa-file-contract"></i> My Purchases
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/wallet/history">
+                <i class="fas fa-wallet"></i> Wallet
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/support">
+                <i class="fas fa-headset"></i> Support
+              </a></li>
+            </ul>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">
+              <i class="fas fa-shopping-cart"></i>
+              <span>Cart</span>
+            </a>
+          </li>
+          
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle user-section" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+              <span><%= user.name %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/settings">
+                <i class="fas fa-cog"></i> Settings
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a></li>
+            </ul>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Chatbot CSS and JS -->
+<link rel="stylesheet" href="/chatbot.css">
+<script src="/chatbot.js"></script>

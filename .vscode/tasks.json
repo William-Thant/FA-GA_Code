@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Cardealership App",
+			"type": "shell",
+			"command": "node app.js",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

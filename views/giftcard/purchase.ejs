@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Gift Card - Isaac's Cardealership</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    body { 
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      min-height: 100vh;
+      color: #ffffff;
+    }
+    .page-header { 
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #ff3333 100%);
+      color: white; 
+      padding: 60px 0; 
+      margin-bottom: 40px;
+      border-bottom: 3px solid #ff3333;
+      box-shadow: 0 10px 40px rgba(255, 51, 51, 0.3);
+    }
+    .page-header h1 {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 2.5rem;
+      text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+    }
+    .page-header p {
+      color: #a8a8a8;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    .gift-card-preview {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      color: white;
+      padding: 50px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: 0 15px 50px rgba(255, 51, 51, 0.5);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #ff3333;
+      transition: all 0.3s ease;
+    }
+    .gift-card-preview:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(255, 51, 51, 0.7);
+    }
+    .gift-card-preview::before {
+      content: '🎁';
+      position: absolute;
+      font-size: 250px;
+      opacity: 0.1;
+      top: -60px;
+      right: -60px;
+      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+    }
+    .gift-card-preview h2 {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    .amount-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin: 25px 0;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+      color: #ffd700;
+    }
+    .form-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #333;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      padding: 40px;
+      transition: all 0.3s ease;
+    }
+    .form-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 50px rgba(255, 51, 51, 0.3);
+      border-color: #ff3333;
+    }
+    .preset-amount {
+      cursor: pointer;
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      margin: 5px;
+      transition: all 0.3s;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .preset-amount:hover {
+      border-color: #ff3333;
+      background: rgba(255, 51, 51, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 51, 51, 0.3);
+    }
+    .preset-amount.selected {
+      border-color: #ff3333;
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      color: white;
+      box-shadow: 0 5px 20px rgba(255, 51, 51, 0.5);
+    }
+    .form-label {
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+    }
+    .form-control, .form-select {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid #333;
+      color: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: #ff3333;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+    }
+    .form-control::placeholder {
+      color: #666;
+    }
+    .form-select option {
+      background: #1a1a1a;
+      color: #ffffff;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      color: white !important;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 18px 40px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+    }
+    .text-muted {
+      color: #a8a8a8 !important;
+    }
+    .text-success {
+      color: #00d4ff !important;
+    }
+    .text-primary {
+      color: #ff3333 !important;
+    }
+    hr {
+      border-color: #333 !important;
+      opacity: 1;
+      margin: 30px 0;
+    }
+    h4, h5 {
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #333;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .card-body {
+      color: #ffffff;
+    }
+    .card-title {
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .list-unstyled li {
+      color: #a8a8a8;
+      font-size: 1rem;
+      padding: 8px 0;
+    }
+    .alert-info {
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid #00d4ff;
+      color: #00d4ff;
+      border-radius: 10px;
+      padding: 15px;
+      font-weight: 600;
+    }
+    .alert-danger {
+      background: rgba(255, 51, 51, 0.1);
+      border: 2px solid #ff3333;
+      color: #ff3333;
+    }
+    #purchaseBtn {
+      max-width: none;
+      margin: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="page-header">
+    <div class="container">
+      <h1 class="text-center"><i class="fas fa-gift me-2"></i>PURCHASE A GIFT CARD</h1>
+      <p class="text-center mb-0">The perfect gift for any occasion!</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <% if (messages.error && messages.error.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= messages.error[0] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="gift-card-preview">
+          <h2><i class="fas fa-car me-2"></i>Dealership Gift Card</h2>
+          <div class="amount-display">$<span id="preview-amount">50.00</span></div>
+          <p class="mb-0"><i class="fas fa-check-circle me-1"></i> Valid for 1 year</p>
+          <p><i class="fas fa-car-side me-1"></i> Use on any vehicle purchase</p>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-info-circle text-primary me-2"></i>Why Gift Cards?</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Perfect for any occasion</li>
+              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> No expiry hassle (1 year validity)</li>
+              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Instant email delivery option</li>
+              <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Can be used for multiple purchases</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="form-card">
+          <form method="POST" action="/giftcards/purchase" id="giftCardForm">
+            <h4 class="mb-4"><i class="fas fa-edit me-2"></i>Gift Card Details</h4>
+            
+            <div class="mb-4">
+              <label class="form-label fw-bold">Select Amount *</label>
+              <div class="row g-2 mb-3">
+                <div class="col-4">
+                  <div class="preset-amount" data-amount="1000">
+                    <div class="fw-bold">$1,000</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="preset-amount selected" data-amount="5000">
+                    <div class="fw-bold">$5,000</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="preset-amount" data-amount="10000">
+                    <div class="fw-bold">$10,000</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="preset-amount" data-amount="25000">
+                    <div class="fw-bold">$25,000</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="preset-amount" data-amount="50000">
+                    <div class="fw-bold">$50,000</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="preset-amount" data-amount="custom">
+                    <div class="fw-bold">Custom</div>
+                  </div>
+                </div>
+              </div>
+              <input type="number" name="amount" class="form-control form-control-lg" min="10" max="100000" step="0.01" value="5000" required id="amount-input">
+              <small class="text-muted">Minimum: $10, Maximum: $100,000</small>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="fas fa-envelope me-2"></i>Delivery Method</label>
+              <select name="sendEmail" class="form-select" id="send-email">
+                <option value="no">I'll share it myself</option>
+                <option value="yes">Email to recipient</option>
+              </select>
+            </div>
+            
+            <div id="email-fields" style="display: none;">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>The gift card will be sent directly to the recipient's email.
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-bold">Recipient Email *</label>
+                <input type="email" name="recipientEmail" class="form-control" placeholder="recipient@example.com">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-bold">Recipient Name</label>
+                <input type="text" name="recipientName" class="form-control" placeholder="John Doe">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-bold">Personal Message (Optional)</label>
+                <textarea name="message" class="form-control" rows="3" placeholder="Happy Birthday! Enjoy shopping with this gift card!"></textarea>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-3" id="purchaseBtn">
+              <i class="fas fa-shopping-cart me-2"></i>Purchase Gift Card - $<span id="button-amount">50.00</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const amountInput = document.getElementById('amount-input');
+    const previewAmount = document.getElementById('preview-amount');
+    const buttonAmount = document.getElementById('button-amount');
+    const presetButtons = document.querySelectorAll('.preset-amount');
+
+    // Handle preset amount clicks
+    presetButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        presetButtons.forEach(btn => btn.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        const amount = this.dataset.amount;
+        if (amount === 'custom') {
+          amountInput.value = '';
+          amountInput.focus();
+        } else {
+          amountInput.value = amount;
+          updateDisplay(amount);
+        }
+      });
+    });
+
+    // Handle amount input changes
+    amountInput.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value) || 0;
+      updateDisplay(value);
+      
+      // Update preset selection
+      let matchFound = false;
+      presetButtons.forEach(btn => {
+        if (btn.dataset.amount == value) {
+          btn.classList.add('selected');
+          matchFound = true;
+        } else if (btn.dataset.amount !== 'custom') {
+          btn.classList.remove('selected');
+        }
+      });
+      
+      if (!matchFound) {
+        presetButtons.forEach(btn => {
+          if (btn.dataset.amount === 'custom') {
+            btn.classList.add('selected');
+          } else {
+            btn.classList.remove('selected');
+          }
+        });
+      }
+    });
+
+    function updateDisplay(amount) {
+      const formattedAmount = parseFloat(amount || 0).toFixed(2);
+      previewAmount.textContent = formattedAmount;
+      buttonAmount.textContent = formattedAmount;
+    }
+    
+    // Handle email delivery toggle
+    document.getElementById('send-email').addEventListener('change', (e) => {
+      const emailFields = document.getElementById('email-fields');
+      const recipientEmail = document.querySelector('input[name="recipientEmail"]');
+      
+      if (e.target.value === 'yes') {
+        emailFields.style.display = 'block';
+        recipientEmail.required = true;
+      } else {
+        emailFields.style.display = 'none';
+        recipientEmail.required = false;
+      }
+    });
+
+    // Form validation
+    document.getElementById('giftCardForm').addEventListener('submit', (e) => {
+      const amount = parseFloat(amountInput.value);
+      if (amount < 10 || amount > 100000) {
+        e.preventDefault();
+        alert('Gift card amount must be between $10 and $100,000');
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>

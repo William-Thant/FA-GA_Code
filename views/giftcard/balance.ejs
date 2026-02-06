@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Gift Card Balance - Isaac's Cardealership</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    body { 
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      min-height: 100vh;
+      color: #ffffff;
+    }
+    .balance-container {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+    .balance-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #333;
+      border-radius: 20px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.7);
+      padding: 50px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .balance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(255, 51, 51, 0.4);
+      border-color: #ff3333;
+    }
+    .icon-header {
+      font-size: 70px;
+      color: #ff3333;
+      margin-bottom: 30px;
+      filter: drop-shadow(0 0 20px rgba(255, 51, 51, 0.5));
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    h2 {
+      color: #ffffff;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 2rem;
+      text-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+    }
+    .text-muted {
+      color: #a8a8a8 !important;
+      font-size: 1.1rem;
+    }
+    .code-input {
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      text-align: center;
+      text-transform: uppercase;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid #333;
+      color: #00d4ff;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+    .code-input:focus {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: #ff3333;
+      color: #00d4ff;
+      box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+      outline: none;
+    }
+    .code-input::placeholder {
+      color: #666;
+    }
+    .check-btn {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      color: white !important;
+      padding: 18px 50px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 25px;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+    }
+    .check-btn:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+    }
+    .balance-result {
+      margin-top: 30px;
+      padding: 40px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .balance-amount {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #ffd700;
+      margin: 20px 0;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+    .expiry-info {
+      color: #00d4ff;
+      margin-top: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      color: white !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 30px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 51, 51, 0.5);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      border: 2px solid #00d4ff;
+      color: white !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 30px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+    .btn-success:hover {
+      background: linear-gradient(135deg, #0099cc 0%, #007799 100%);
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(0, 212, 255, 0.5);
+    }
+    .btn-outline-primary {
+      border: 2px solid #ff3333;
+      color: #ff3333 !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: transparent;
+      padding: 12px 30px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+    .btn-outline-primary:hover {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      color: white !important;
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 51, 51, 0.5);
+    }
+    hr {
+      border-color: #333 !important;
+      opacity: 1;
+      margin: 40px 0;
+    }
+    h6 {
+      color: #ffffff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .list-unstyled li {
+      color: #a8a8a8;
+      font-size: 1rem;
+      padding: 8px 0;
+    }
+    .text-success {
+      color: #00d4ff !important;
+    }
+    .text-primary {
+      color: #ff3333 !important;
+    }
+    .spinner-border {
+      border-color: #ff3333;
+      border-right-color: transparent;
+    }
+    .bg-success {
+      background: rgba(0, 212, 255, 0.1) !important;
+    }
+    .border-success {
+      border-color: #00d4ff !important;
+    }
+    .bg-danger {
+      background: rgba(255, 51, 51, 0.1) !important;
+    }
+    .border-danger {
+      border-color: #ff3333 !important;
+    }
+    .text-danger {
+      color: #ff3333 !important;
+    }
+    .alert-warning {
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      font-weight: 600;
+    }
+    small {
+      color: #666 !important;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container">
+    <div class="balance-container">
+      <div class="balance-card">
+        <div class="icon-header">
+          <i class="fas fa-credit-card"></i>
+        </div>
+        
+        <h2 class="mb-3">Check Gift Card Balance</h2>
+        <p class="text-muted mb-4">Enter your gift card code to check the remaining balance</p>
+        
+        <div class="mb-4">
+          <input type="text" id="gift-card-code" class="form-control form-control-lg code-input" placeholder="GCXXXXXXXXXXXX" maxlength="20">
+          <small class="text-muted">Gift card codes are case-insensitive</small>
+        </div>
+        
+        <button onclick="checkBalance()" class="btn btn-primary check-btn">
+          <i class="fas fa-search me-2"></i>Check Balance
+        </button>
+        
+        <div id="balance-result" style="display: none;"></div>
+        
+        <hr class="my-4">
+        
+        <div class="text-start">
+          <h6 class="mb-3"><i class="fas fa-info-circle text-primary me-2"></i>About Gift Cards</h6>
+          <ul class="list-unstyled text-muted small">
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Gift cards are valid for 1 year from purchase</li>
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Partial balances can be used across multiple orders</li>
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Gift cards cannot be redeemed for cash</li>
+            <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Lost or stolen cards cannot be replaced</li>
+          </ul>
+        </div>
+
+        <% if (user) { %>
+        <div class="mt-4">
+          <a href="/giftcards/my-cards" class="btn btn-outline-primary">
+            <i class="fas fa-list me-2"></i>View My Gift Cards
+          </a>
+        </div>
+        <% } else { %>
+        <div class="mt-4">
+          <p class="text-muted mb-2">Want to purchase a gift card?</p>
+          <a href="/login" class="btn btn-outline-primary">
+            <i class="fas fa-sign-in-alt me-2"></i>Login to Purchase
+          </a>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    async function checkBalance() {
+      const code = document.getElementById('gift-card-code').value.trim();
+      const resultDiv = document.getElementById('balance-result');
+      
+      if (!code) {
+        showError('Please enter a gift card code');
+        return;
+      }
+      
+      // Show loading state
+      resultDiv.innerHTML = `
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Checking balance...</p>
+        </div>
+      `;
+      resultDiv.style.display = 'block';
+      
+      try {
+        const response = await fetch('/giftcards/check-balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          const expiryDate = new Date(result.expiryDate);
+          const isExpiringSoon = (expiryDate - new Date()) < (30 * 24 * 60 * 60 * 1000); // 30 days
+          
+          resultDiv.innerHTML = `
+            <div class="balance-result bg-success bg-opacity-10 border border-success">
+              <i class="fas fa-check-circle text-success" style="font-size: 50px;"></i>
+              <h4 class="mt-3" style="color: #ffffff; font-weight: 700;">Current Balance</h4>
+              <div class="balance-amount">$${result.balance.toFixed(2)}</div>
+              <div class="expiry-info">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Expires: ${expiryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </div>
+              ${isExpiringSoon ? '<div class="alert alert-warning mt-3 mb-0"><i class="fas fa-exclamation-triangle me-2"></i>This gift card expires soon!</div>' : ''}
+              <div class="mt-4">
+                <a href="/shop" class="btn btn-success">
+                  <i class="fas fa-car me-2"></i>Use Now
+                </a>
+              </div>
+            </div>
+          `;
+        } else {
+          showError(result.error || 'Invalid gift card code');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Error checking balance. Please try again.');
+      }
+    }
+
+    function showError(message) {
+      const resultDiv = document.getElementById('balance-result');
+      resultDiv.innerHTML = `
+        <div class="balance-result bg-danger bg-opacity-10 border border-danger">
+          <i class="fas fa-times-circle text-danger" style="font-size: 50px;"></i>
+          <h5 class="mt-3 text-danger">${message}</h5>
+          <p class="text-muted mb-0">Please check your code and try again</p>
+        </div>
+      `;
+      resultDiv.style.display = 'block';
+    }
+
+    // Allow Enter key to check balance
+    document.getElementById('gift-card-code').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        checkBalance();
+      }
+    });
+  </script>
+</body>
+</html>

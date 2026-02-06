@@ -1,0 +1,16 @@
+<% if (typeof messages !== 'undefined') { %>
+  <% if (messages.error && messages.error.length) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <i class="fas fa-exclamation-circle"></i> 
+      <%= messages.error.join ? messages.error.join(', ') : messages.error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% } %>
+  <% if (messages.success && messages.success.length) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+      <i class="fas fa-check-circle"></i> 
+      <%= messages.success.join ? messages.success.join(', ') : messages.success %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% } %>
+<% } %>

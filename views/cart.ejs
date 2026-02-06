@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart - Isaac's Cardealership</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <% if (process.env.PAYPAL_CLIENT_ID) { %>
+    <script src="https://www.paypal.com/sdk/js?client-id=<%= process.env.PAYPAL_CLIENT_ID %>&currency=SGD"></script>
+  <% } %>
+  <% if (process.env.STRIPE_PUBLISHABLE_KEY) { %>
+    <script src="https://js.stripe.com/v3/"></script>
+  <% } %>
+  <style>
+    body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); min-height: 100vh; color: #ffffff; }
+    .page-header { 
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #ff3333 100%);
+      color: white;
+      padding: 60px 0;
+      margin-bottom: 40px;
+      border-bottom: 3px solid #ff3333;
+      box-shadow: 0 10px 40px rgba(255, 51, 51, 0.3);
+    }
+    .page-header h1 {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+    }
+    .cart-item { 
+      border-bottom: 2px solid #333;
+      padding: 25px 0;
+      transition: all 0.3s ease;
+    }
+    .cart-item:hover {
+      background: rgba(255, 51, 51, 0.05);
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 10px;
+    }
+    .cart-item:first-child { padding-top: 0; }
+    .cart-item h6 {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .cart-item .meta {
+      color: #00d4ff;
+      font-weight: 600;
+    }
+    .cart-summary { 
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #333;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: sticky;
+      top: 20px;
+    }
+    .cart-summary h5 {
+      color: #ffffff;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: 2px solid #ff3333;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .summary-row { 
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #333;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .summary-row.total { 
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ffd700;
+      border: none;
+      padding: 20px 0;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      border-top: 2px solid #ff3333;
+      margin-top: 10px;
+    }
+    .product-image { 
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #333;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .btn-cart-update { 
+      padding: 8px 15px;
+      margin-left: 8px;
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      border: 2px solid #00d4ff;
+      color: white;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+    .btn-cart-update:hover {
+      background: linear-gradient(135deg, #0099cc 0%, #007799 100%);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
+    }
+    .btn-cart-remove { 
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      color: white;
+      font-weight: 700;
+    }
+    .btn-cart-remove:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      box-shadow: 0 5px 15px rgba(255, 51, 51, 0.5);
+    }
+    .cart-actions { 
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .bg-white {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
+      border: 2px solid #333;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .bg-white h5 {
+      color: #ffffff;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .text-success {
+      color: #ffd700 !important;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .text-muted {
+      color: #a8a8a8 !important;
+    }
+    .badge {
+      padding: 8px 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .bg-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%) !important;
+    }
+    .form-control {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid #333;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .form-control:focus {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: #ff3333;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+    }
+    .bg-light {
+      background: rgba(0, 0, 0, 0.3) !important;
+      border: 1px solid #333 !important;
+    }
+    .bg-light i {
+      color: #666 !important;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      border: 2px solid #ff3333;
+      color: white !important;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      transform: scale(1.02);
+      box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+    }
+    .btn-outline-primary {
+      border: 2px solid #ff3333;
+      color: #ff3333 !important;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: transparent;
+    }
+    .btn-outline-primary:hover {
+      background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+      color: white !important;
+      box-shadow: 0 5px 15px rgba(255, 51, 51, 0.5);
+    }
+    .btn-outline-danger {
+      border: 2px solid #ff3333;
+      color: #ff3333 !important;
+      font-weight: 700;
+      background: transparent;
+    }
+    .btn-outline-danger:hover {
+      background: linear-gradient(135deg, #ff3333 0%, #990000 100%);
+      color: white !important;
+    }
+    .btn-outline-success {
+      border: 2px solid #00d4ff;
+      color: #00d4ff !important;
+      font-weight: 700;
+      background: transparent;
+    }
+    .btn-outline-success:hover {
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      color: white !important;
+    }
+    .alert-success {
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid #00d4ff;
+      color: #00d4ff;
+      font-weight: 600;
+    }
+    .alert-info {
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid #ffd700;
+      color: #ffd700;
+    }
+    .modal-content {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #ff3333;
+      color: #ffffff;
+    }
+    .modal-header {
+      border-bottom: 2px solid #ff3333;
+    }
+    .modal-title {
+      color: #ffffff;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .modal-footer {
+      border-top: 2px solid #333;
+    }
+    .btn-close {
+      filter: invert(1);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+      border: 2px solid #333;
+      color: white !important;
+      font-weight: 700;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #ff3333 0%, #990000 100%);
+      border: 2px solid #ff3333;
+      color: white !important;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+<%- include('partials/navbar') %>
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+  </div>
+</div>
+
+<!-- Remove confirmation modal -->
+<div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmRemoveLabel">Confirm Removal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to remove <strong id="remove-item-name"></strong> from your cart?
+        <input type="hidden" id="remove-item-id" value="">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirmRemoveBtn" class="btn btn-danger">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts: Bootstrap bundle and cart AJAX handlers -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Helper to format number to 2 decimals
+  function fmt(n) { return Number(n).toFixed(2); }
+
+  // Update totals in the summary
+  function updateTotals(totals) {
+    if (!totals) return;
+    document.getElementById('cart-subtotal').textContent = fmt(totals.subtotal);
+    document.getElementById('cart-tax').textContent = fmt(totals.tax);
+    const commissionEl = document.getElementById('cart-commission');
+    if (commissionEl && totals.commission !== undefined) {
+      commissionEl.textContent = fmt(totals.commission);
+    }
+    document.getElementById('cart-total').textContent = fmt(totals.total);
+    const countEl = document.getElementById('cart-count');
+    if (countEl && typeof totals.cartCount !== 'undefined') countEl.textContent = totals.cartCount;
+  }
+
+  // Attach AJAX submit for update forms
+  document.querySelectorAll('.js-cart-update-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; btn.classList.add('disabled'); }
+      const fd = new FormData(form);
+      console.log('Sending AJAX update', Array.from(fd.entries()));
+      fetch('/cart/update', {
+        method: 'POST',
+        body: new URLSearchParams(fd),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }).then(r => r.json()).then(data => {
+        console.log('Update response', data);
+        if (btn) { btn.disabled = false; btn.classList.remove('disabled'); }
+        if (data && data.success) {
+          const id = form.querySelector('input[name="id"]').value;
+          // Update quantity badge
+          const qtyEl = document.getElementById('item-qty-' + id);
+          if (qtyEl) qtyEl.textContent = 'x ' + data.quantity;
+          // Update item total (use data attributes to compute price)
+          const itemDiv = document.getElementById('cart-item-' + id);
+          if (itemDiv) {
+            const price = parseFloat(itemDiv.getAttribute('data-price')) || 0;
+            const totalEl = document.getElementById('item-total-' + id);
+            if (totalEl) totalEl.textContent = '$' + fmt(price * data.quantity);
+          }
+          updateTotals(Object.assign({}, data.totals, { cartCount: data.cartCount }));
+        } else {
+          alert('Could not update item. Please try again.');
+        }
+      }).catch(err => {
+        console.error('Update error', err);
+        if (btn) { btn.disabled = false; btn.classList.remove('disabled'); }
+        alert('Server error while updating item');
+      });
+    });
+  });
+
+  // Remove modal logic
+  let removeModal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
+  let currentRemoveId = null;
+
+  document.querySelectorAll('.btn-cart-remove').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      const id = btn.getAttribute('data-id');
+      const name = btn.getAttribute('data-name');
+      currentRemoveId = id;
+      document.getElementById('remove-item-name').textContent = name;
+      document.getElementById('remove-item-id').value = id;
+      removeModal.show();
+    });
+  });
+
+  document.getElementById('confirmRemoveBtn').addEventListener('click', function () {
+    const id = document.getElementById('remove-item-id').value || currentRemoveId;
+    if (!id) return;
+    fetch('/cart/remove', {
+      method: 'POST',
+      body: new URLSearchParams({ id }),
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(r => r.json()).then(data => {
+      if (data && data.success) {
+        // remove DOM node
+        const node = document.getElementById('cart-item-' + id);
+        if (node) node.remove();
+        updateTotals(Object.assign({}, data.totals, { cartCount: data.cartCount }));
+        removeModal.hide();
+      }
+    }).catch(err => console.error('Remove error', err));
+  });
+  
+  // Discount code handling
+  const applyDiscountBtn = document.getElementById('apply-discount-btn');
+  const removeDiscountBtn = document.getElementById('remove-discount-btn');
+  const discountInput = document.getElementById('discount-code-input');
+  const discountMessage = document.getElementById('discount-message');
+  
+  if (applyDiscountBtn && discountInput) {
+    applyDiscountBtn.addEventListener('click', function() {
+      const code = discountInput.value.trim();
+      if (!code) {
+        showDiscountMessage('Please enter a discount code', 'error');
+        return;
+      }
+      
+      applyDiscountBtn.disabled = true;
+      applyDiscountBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      
+      fetch('/api/discount/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ code: code })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showDiscountMessage('Discount applied successfully!', 'success');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showDiscountMessage(data.error || 'Invalid discount code', 'error');
+          applyDiscountBtn.disabled = false;
+          applyDiscountBtn.textContent = 'Apply';
+        }
+      })
+      .catch(err => {
+        console.error('Discount error:', err);
+        showDiscountMessage('Error applying discount', 'error');
+        applyDiscountBtn.disabled = false;
+        applyDiscountBtn.textContent = 'Apply';
+      });
+    });
+    
+    // Allow Enter key to apply discount
+    discountInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        applyDiscountBtn.click();
+      }
+    });
+  }
+  
+  if (removeDiscountBtn) {
+    removeDiscountBtn.addEventListener('click', function() {
+      fetch('/api/discount/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        }
+      })
+      .catch(err => console.error('Remove discount error:', err));
+    });
+  }
+  
+  function showDiscountMessage(message, type) {
+    if (discountMessage) {
+      discountMessage.textContent = message;
+      discountMessage.className = 'mt-2 text-sm ' + (type === 'error' ? 'text-danger' : 'text-success');
+    }
+  }
+});
+</script>
+
+<div class="container pb-5">
+  <% if (typeof messages !== 'undefined') { %>
+    <% if (messages.error && messages.error.length) { %>
+      <div class="container mt-3">
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= messages.error.join ? messages.error.join(', ') : messages.error %></div>
+      </div>
+    <% } %>
+    <% if (messages.success && messages.success.length) { %>
+      <div class="container mt-3">
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= messages.success.join ? messages.success.join(', ') : messages.success %></div>
+      </div>
+    <% } %>
+  <% } %>
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <% if (cart.length === 0) { %>
+        <div class="alert alert-info text-center">
+          <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+          <h4>Your cart is empty</h4>
+          <p class="mb-0">Start shopping to add items</p>
+        </div>
+        <div class="text-center mt-4">
+          <a href="/shop" class="btn btn-primary btn-lg" style="color: white !important;"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+        </div>
+      <% } else { %>
+        <div class="bg-white rounded p-4">
+          <h5 class="mb-4"><i class="fas fa-list"></i> Cart Items (<span id="cart-count"><%= cart.length %></span>)</h5>
+          <% let total = 0; %>
+          <% for (let i = 0; i < cart.length; i++) { %>
+            <div class="cart-item" id="cart-item-<%= cart[i].id %>" data-id="<%= cart[i].id %>" data-name="<%= cart[i].productName %>" data-price="<%= cart[i].price %>">
+              <div class="row align-items-center">
+                <div class="col-md-2">
+                  <% if (cart[i].image) { %>
+                    <img src="/images/<%= cart[i].image %>" class="product-image" alt="<%= cart[i].productName %>">
+                  <% } else { %>
+                    <div class="bg-light d-flex align-items-center justify-content-center product-image"><i class="fas fa-image fa-2x text-muted"></i></div>
+                  <% } %>
+                </div>
+                <div class="col-md-5">
+                  <h6 class="mb-1"><%= cart[i].productName %></h6>
+                  <div class="meta">Price: $<%= cart[i].price.toFixed(2) %></div>
+                </div>
+                <div class="col-md-2 text-center">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <span class="badge bg-primary" id="item-qty-<%= cart[i].id %>">x <%= cart[i].quantity %></span>
+                  </div>
+                </div>
+                <div class="col-md-3 text-end">
+                  <h6 class="text-success mb-0" id="item-total-<%= cart[i].id %>">$<%= (cart[i].price * cart[i].quantity).toFixed(2) %></h6>
+                  <small class="text-muted d-block mb-2"><%= cart[i].quantity %> × $<%= cart[i].price.toFixed(2) %></small>
+                  <div class="cart-actions">
+                    <form action="/cart/update" method="POST" class="js-cart-update-form d-inline-block me-1" data-item-id="<%= cart[i].id %>">
+                      <input type="hidden" name="id" value="<%= cart[i].id %>">
+                      <input type="number" name="quantity" value="<%= cart[i].quantity %>" min="1" class="form-control form-control-sm d-inline" style="width:90px; display:inline-block;">
+                      <button class="btn btn-cart-update btn-sm btn-success ms-2" type="submit"><i class="fas fa-sync-alt"></i> Update</button>
+                    </form>
+                    <button class="btn btn-cart-remove btn-sm btn-danger" type="button" data-id="<%= cart[i].id %>" data-name="<%= cart[i].productName %>"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% total += cart[i].price * cart[i].quantity; %>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
+    <% if (cart.length > 0) { %>
+      <div class="col-lg-4">
+        <div class="cart-summary">
+          <h5 class="mb-4"><i class="fas fa-receipt"></i> Order Summary</h5>
+          <% let subtotal = 0; %>
+          <% for (let i = 0; i < cart.length; i++) { %>
+            <% subtotal += cart[i].price * cart[i].quantity; %>
+          <% } %>
+          
+          <% let discountAmount = 0; %>
+          <% if (appliedDiscount) { %>
+            <% discountAmount = appliedDiscount.amount; %>
+          <% } %>
+          <% const taxableAmount = subtotal - discountAmount; %>
+          <% const tax = taxableAmount * 0.1; %>
+          <% const commission = taxableAmount * 0.1; %>
+          <% const total = taxableAmount + tax + commission; %>
+          
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>$<span id="cart-subtotal"><%= subtotal.toFixed(2) %></span></span>
+          </div>
+          
+          <!-- Discount Code Section -->
+          <div class="my-3 p-3 bg-light rounded">
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-tag text-success me-2"></i>
+              <strong>Discount Code</strong>
+            </div>
+            <% if (appliedDiscount) { %>
+              <div class="alert alert-success mb-2 py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span><strong><%= appliedDiscount.code %></strong> applied!</span>
+                  <button class="btn btn-sm btn-outline-danger" id="remove-discount-btn">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            <% } else { %>
+              <div class="input-group input-group-sm">
+                <input type="text" id="discount-code-input" class="form-control" placeholder="Enter code" maxlength="50">
+                <button class="btn btn-outline-success" type="button" id="apply-discount-btn">
+                  Apply
+                </button>
+              </div>
+              <div id="discount-message" class="mt-2 text-sm"></div>
+            <% } %>
+          </div>
+          
+          <% if (appliedDiscount) { %>
+          <div class="summary-row text-success">
+            <span>Discount (<%= appliedDiscount.code %>):</span>
+            <span>-$<span id="cart-discount"><%= discountAmount.toFixed(2) %></span></span>
+          </div>
+          <% } else { %>
+          <div class="summary-row text-success d-none" id="discount-row">
+            <span>Discount: <span id="discount-code-label"></span></span>
+            <span>-$<span id="cart-discount">0.00</span></span>
+          </div>
+          <% } %>
+          
+          <div class="summary-row">
+            <span>Tax (10%):</span>
+            <span>$<span id="cart-tax"><%= tax.toFixed(2) %></span></span>
+          </div>
+          
+          <div class="summary-row" style="color: #00d4ff;">
+            <span>Platform Fee (10%):</span>
+            <span>$<span id="cart-commission"><%= commission.toFixed(2) %></span></span>
+          </div>
+          
+          <!-- Wallet Balance Section -->
+          <% if (walletBalance > 0) { %>
+          <div class="my-3 p-3 bg-light rounded">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <i class="fas fa-wallet text-primary me-2"></i>
+                <strong>Wallet Balance:</strong> $<%= walletBalance.toFixed(2) %>
+              </div>
+              <a href="/wallet/history" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-history"></i>
+              </a>
+            </div>
+            <% const walletUsage = Math.min(walletBalance, total); %>
+            <% if (walletUsage > 0) { %>
+            <div class="alert alert-info mb-0 py-2">
+              <small>
+                <i class="fas fa-check-circle"></i>
+                $<%= walletUsage.toFixed(2) %> will be deducted from your wallet
+                <% if (total > walletBalance) { %>
+                  <br>Remaining: $<%= (total - walletBalance).toFixed(2) %>
+                <% } %>
+              </small>
+            </div>
+            <% } %>
+          </div>
+          <% } else { %>
+          <div class="text-center py-2 my-3" style="color: #a8a8a8;">
+            <small><i class="fas fa-wallet me-2" style="color: #00d4ff;"></i>
+            <a href="/wallet/topup" style="color: #00d4ff; text-decoration: underline;">Top up your wallet</a> for faster checkout</small>
+          </div>
+          <% } %>
+          
+          <div class="summary-row total">
+            <span>Total:</span>
+            <span>$<span id="cart-total"><%= total.toFixed(2) %></span></span>
+          </div>
+          
+          <!-- Payment Button -->
+          <div class="mt-4">
+            <a href="/payment" class="btn btn-primary w-100 btn-lg">
+              <i class="fas fa-credit-card"></i> Proceed to Payment
+            </a>
+          </div>
+          
+          <a href="/shop" class="btn btn-outline-primary w-100 mt-3" style="color: white !important;"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+          <form action="/cart/clear" method="POST" class="mt-2" onsubmit="return confirm('Are you sure you want to clear your entire cart?');">
+            <button type="submit" class="btn btn-outline-danger w-100"><i class="fas fa-trash-alt"></i> Clear Cart</button>
+          </form>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+</body>
+</html>

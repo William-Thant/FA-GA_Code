@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    /* Override any Bootstrap/default styles */
+    html, body {
+      background: #0a0a0a !important;
+      color: #ffffff !important;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #0a0a0a 100%) !important;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 51, 51, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* Ensure all containers are transparent or dark */
+    .container, .container-fluid {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, rgba(255, 51, 51, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%),
+                  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 400"><rect fill="%23ff3333" opacity="0.05" width="1920" height="400"/></svg>');
+      padding: 80px 0 100px;
+      margin-bottom: 60px;
+      border-bottom: 3px solid #ff3333;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 100px,
+        rgba(255, 51, 51, 0.03) 100px,
+        rgba(255, 51, 51, 0.03) 101px
+      );
+    }
+    
+    .page-title {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 40px rgba(255, 51, 51, 0.5);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .page-subtitle {
+      color: #ffffff;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      position: relative;
+      z-index: 1;
+      font-weight: 300;
+    }
+    
+    .filters-section {
+      background: linear-gradient(145deg, #141414, #1a1a1a);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 50px;
+      border: 1px solid #333;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+    
+    .filter-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    
+    .filter-btn {
+      background: rgba(255, 51, 51, 0.1);
+      border: 1px solid rgba(255, 51, 51, 0.3);
+      color: #ffffff;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      background: linear-gradient(135deg, #ff3333, #cc0000);
+      border-color: #ff3333;
+      box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .vehicle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    
+    .vehicle-card {
+      background: linear-gradient(145deg, #141414, #1a1a1a);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #222;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .vehicle-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ff3333, #00d4ff);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    
+    .vehicle-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 0 50px rgba(255, 51, 51, 0.4), 0 20px 50px rgba(0,0,0,0.7);
+      border-color: #ff3333;
+    }
+    
+    .vehicle-card:hover::before {
+      opacity: 1;
+    }
+    
+    .vehicle-image-container {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    }
+    
+    .vehicle-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .vehicle-card:hover .vehicle-image {
+      transform: scale(1.15);
+    }
+    
+    .condition-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #ffd700;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 1px solid #ffd700;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+    
+    .condition-badge.used {
+      color: #00d4ff;
+      border-color: #00d4ff;
+    }
+    
+    .vehicle-body {
+      padding: 30px;
+    }
+    
+    .vehicle-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+    
+    .vehicle-name a {
+      color: #ffffff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .vehicle-name a:hover {
+      color: #ff3333;
+    }
+    
+    .vehicle-meta {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #a8a8a8;
+    }
+    
+    .vehicle-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .vehicle-price {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ff3333, #ff6666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      text-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+    }
+    
+    .vehicle-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .spec-badge {
+      background: rgba(0, 212, 255, 0.15);
+      color: #00d4ff;
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid rgba(0, 212, 255, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .spec-badge:hover {
+      background: rgba(0, 212, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+    }
+    
+    .availability-badge {
+      background: rgba(0, 255, 136, 0.15);
+      color: #00ff88;
+      border-color: rgba(0, 255, 136, 0.4);
+    }
+    
+    .sold-badge {
+      background: rgba(255, 51, 51, 0.15);
+      color: #ff3333;
+      border-color: rgba(255, 51, 51, 0.4);
+    }
+    
+    .vehicle-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .quantity-select {
+      background: rgba(255, 51, 51, 0.1);
+      border: 2px solid #333;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .quantity-select:focus {
+      border-color: #ff3333;
+      box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+      outline: none;
+    }
+    
+    .btn-save {
+      background: linear-gradient(135deg, #ff3333, #cc0000);
+      border: none;
+      color: white;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 15px 35px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      flex-grow: 1;
+      position: relative;
+      overflow: hidden;
+      font-size: 0.95rem;
+    }
+    
+    .btn-save::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-save:hover {
+      box-shadow: 0 0 40px rgba(255, 51, 51, 0.6), 0 10px 30px rgba(0,0,0,0.5);
+      transform: translateY(-3px);
+    }
+    
+    .btn-save:hover::before {
+      left: 100%;
+    }
+    
+    .btn-save:disabled {
+      background: linear-gradient(135deg, #333, #222);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 100px 20px;
+    }
+    
+    .empty-state i {
+      font-size: 6rem;
+      color: #333;
+      margin-bottom: 30px;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      color: #ffffff;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    
+    .empty-state p {
+      color: #a8a8a8;
+      font-size: 1.2rem;
+    }
+    
+    .user-welcome {
+      background: linear-gradient(145deg, #141414, #1a1a1a);
+      padding: 20px 30px;
+      border-radius: 15px;
+      margin-bottom: 40px;
+      border: 1px solid #333;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-welcome i {
+      font-size: 2rem;
+      color: #00d4ff;
+    }
+    
+    .user-welcome-text {
+      color: #a8a8a8;
+      font-size: 1.1rem;
+    }
+    
+    .user-welcome-name {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+    
+    footer {
+      background: #000000 !important;
+      border-top: 3px solid #ff3333;
+      padding: 30px 0;
+      margin-top: 80px;
+    }
+    
+    @media (max-width: 768px) {
+      .vehicle-grid {
+        grid-template-columns: 1fr;
+      }
+      .page-title {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+  <title>Browse Inventory - Isaac's Cardealership</title>
+</head>
+<body>
+<%- include('partials/navbar') %>
+
+<div class="page-header">
+  <div class="container text-center">
+    <h1 class="page-title">
+      <i class="fas fa-warehouse"></i> PREMIUM INVENTORY
+    </h1>
+    <p class="page-subtitle">Discover Your Dream Vehicle Today</p>
+  </div>
+</div>
+
+<div class="container">
+  <% if (user) { %>
+    <div class="user-welcome">
+      <i class="fas fa-user-circle"></i>
+      <div>
+        <div class="user-welcome-text">Welcome back,</div>
+        <div class="user-welcome-name"><%= user.username %></div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-title">
+      <i class="fas fa-filter"></i> Filter By Category
+    </div>
+    <div class="d-flex flex-wrap">
+      <button class="filter-btn active" onclick="filterVehicles('all')">
+        <i class="fas fa-th"></i> All Vehicles
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('Electric')">
+        <i class="fas fa-bolt"></i> Electric
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('Luxury')">
+        <i class="fas fa-gem"></i> Luxury
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('SUV')">
+        <i class="fas fa-truck"></i> SUV
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('Truck')">
+        <i class="fas fa-truck-pickup"></i> Trucks
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('Sedan')">
+        <i class="fas fa-car"></i> Sedans
+      </button>
+      <button class="filter-btn" onclick="filterVehicles('Sports')">
+        <i class="fas fa-flag-checkered"></i> Sports
+      </button>
+    </div>
+  </div>
+
+  <% if (products && products.length > 0) { %>
+    <div class="vehicle-grid">
+      <% for(let i=0; i < products.length; i++) { %>
+        <div class="vehicle-card" data-category="<%= products[i].category %>">
+          <a href="/product/<%= products[i].id %>" style="text-decoration: none; color: inherit;">
+            <div class="vehicle-image-container">
+              <% 
+                // Use uploaded image if available, otherwise use default
+                let imageUrl = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop';
+                if (products[i].image) {
+                  imageUrl = '/images/' + products[i].image;
+                }
+              %>
+              <img src="<%= imageUrl %>" alt="<%= products[i].productName %>" class="vehicle-image">
+              <span class="condition-badge <%= products[i].condition_status === 'used' ? 'used' : '' %>">
+                <%= products[i].condition_status === 'new' ? 'Brand New' : 'Pre-Owned' %>
+              </span>
+            </div>
+          </a>
+          
+          <div class="vehicle-body">
+            <h3 class="vehicle-name">
+              <a href="/product/<%= products[i].id %>">
+                <%= products[i].productName %>
+              </a>
+            </h3>
+            
+            <div class="vehicle-meta">
+              <% if (products[i].year) { %>
+                <div class="vehicle-meta-item">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span><%= products[i].year %></span>
+                </div>
+              <% } %>
+              <% if (products[i].mileage !== undefined) { %>
+                <div class="vehicle-meta-item">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span><%= products[i].mileage.toLocaleString() %> mi</span>
+                </div>
+              <% } %>
+              <% if (products[i].fuel_type) { %>
+                <div class="vehicle-meta-item">
+                  <i class="fas fa-gas-pump"></i>
+                  <span><%= products[i].fuel_type %></span>
+                </div>
+              <% } %>
+            </div>
+            
+            <div class="vehicle-price">$<%= products[i].price.toLocaleString() %></div>
+            
+            <div class="vehicle-specs">
+              <% if (products[i].category) { %>
+                <span class="spec-badge">
+                  <i class="fas fa-tag"></i> <%= products[i].category %>
+                </span>
+              <% } %>
+              <% if (products[i].transmission) { %>
+                <span class="spec-badge">
+                  <i class="fas fa-cog"></i> <%= products[i].transmission %>
+                </span>
+              <% } %>
+              <% if (products[i].quantity > 0) { %>
+                <span class="spec-badge availability-badge">
+                  <i class="fas fa-check-circle"></i> In Stock
+                </span>
+              <% } else { %>
+                <span class="spec-badge sold-badge">
+                  <i class="fas fa-times-circle"></i> Sold Out
+                </span>
+              <% } %>
+            </div>
+
+            <form action="/add-to-cart/<%= products[i].id %>" method="POST" class="vehicle-actions">
+              <select name="quantity" class="quantity-select">
+                <option value="1">Qty: 1</option>
+              </select>
+              <button type="submit" class="btn btn-save" <%= products[i].quantity <= 0 ? 'disabled' : '' %>>
+                <i class="fas fa-heart"></i> Save to List
+              </button>
+            </form>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <i class="fas fa-car-side"></i>
+      <h3>No Vehicles Available</h3>
+      <p>Check back soon for new arrivals and exciting inventory updates!</p>
+    </div>
+  <% } %>
+</div>
+
+<footer class="text-white text-center">
+  <div class="container">
+    <p class="mb-0">&copy; 2026 Isaac's Cardealership. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  function filterVehicles(category) {
+    const cards = document.querySelectorAll('.vehicle-card');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    // Update active button
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.filter-btn').classList.add('active');
+    
+    // Filter cards
+    cards.forEach(card => {
+      if (category === 'all' || card.dataset.category === category) {
+        card.style.display = 'block';
+        setTimeout(() => card.style.opacity = '1', 10);
+      } else {
+        card.style.opacity = '0';
+        setTimeout(() => card.style.display = 'none', 300);
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

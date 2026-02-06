@@ -1,0 +1,437 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Isaac's Cardealership</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .page-header { 
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #ff3333 100%);
+            color: white; 
+            padding: 60px 0; 
+            margin-bottom: 40px;
+            border-bottom: 3px solid #ff3333;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.3);
+        }
+        .page-header h1 {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+        }
+        .page-header p {
+            color: #a8a8a8;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .settings-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 2px solid #333;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 35px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.3);
+            border-color: #ff3333;
+        }
+        .settings-card h5 {
+            color: #ffffff;
+            border-bottom: 2px solid #ff3333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .settings-card h5 i {
+            margin-right: 10px;
+            color: #ff3333;
+            filter: drop-shadow(0 0 10px rgba(255, 51, 51, 0.5));
+        }
+        .danger-zone {
+            border: 2px solid #ff3333;
+            background: linear-gradient(135deg, #1a0505 0%, #0a0a0a 100%);
+        }
+        .danger-zone h5 {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+        }
+        .danger-zone p {
+            color: #ff6666;
+            font-weight: 600;
+        }
+        .form-label {
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .form-control, .form-select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #333;
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0, 0, 0, 0.7);
+            border-color: #ff3333;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+        }
+        .form-control::placeholder {
+            color: #666;
+        }
+        .form-check-input {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 2px solid #333;
+            width: 1.5em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+        .form-check-input:checked {
+            background-color: #ff3333;
+            border-color: #ff3333;
+        }
+        .form-check-input:focus {
+            border-color: #ff3333;
+            box-shadow: 0 0 0 0.25rem rgba(255, 51, 51, 0.25);
+        }
+        .form-check-label {
+            color: #ffffff;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            border: 2px solid #ff3333;
+            color: white !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3333 0%, #990000 100%);
+            border: 2px solid #ff3333;
+            color: white !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #660000 100%);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.7);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            border: 2px solid #333;
+            color: white !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+            border-color: #555;
+        }
+        .alert-success {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+        }
+        .alert-danger {
+            background: rgba(255, 51, 51, 0.1);
+            border: 2px solid #ff3333;
+            color: #ff3333;
+        }
+        .text-muted, .form-text {
+            color: #a8a8a8 !important;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 2px solid #ff3333;
+            color: #ffffff;
+        }
+        .modal-header {
+            border-bottom: 2px solid #ff3333;
+        }
+        .modal-title {
+            color: #ffffff;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .modal-footer {
+            border-top: 2px solid #333;
+        }
+        .modal-body p {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .btn-close {
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-cog"></i> SETTINGS</h1>
+            <p class="mb-0">Manage your account preferences</p>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+
+        <% if (messages.success && messages.success.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> <%= messages.success[0] %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <% if (messages.error && messages.error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> <%= messages.error[0] %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <!-- Profile Settings -->
+        <div class="settings-card">
+            <h5><i class="fas fa-user"></i> Profile Information</h5>
+            <form action="/settings/profile" method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="<%= user.username %>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact Number</label>
+                    <input type="text" class="form-control" id="contact" name="contact" value="<%= user.contact || '' %>">
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" name="address" rows="2"><%= user.address || '' %></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Profile</button>
+            </form>
+        </div>
+
+        <!-- Password Settings -->
+        <div class="settings-card">
+            <h5><i class="fas fa-lock"></i> Change Password</h5>
+            <form action="/settings/password" method="POST">
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="6">
+                    <small class="form-text text-muted">Password must be at least 6 characters long</small>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Change Password</button>
+            </form>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-card">
+            <h5><i class="fas fa-bell"></i> Notifications</h5>
+            <form action="/settings/notifications" method="POST">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="emailNotifications" name="emailNotifications" <%= user && user.emailNotifications ? 'checked' : '' %>>
+                    <label class="form-check-label" for="emailNotifications">
+                        Email notifications for order updates
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="promotionalEmails" name="promotionalEmails" <%= user && user.promotionalEmails ? 'checked' : '' %>>
+                    <label class="form-check-label" for="promotionalEmails">
+                        Receive promotional emails and special offers
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter" <%= user && user.newsletter ? 'checked' : '' %>>
+                    <label class="form-check-label" for="newsletter">
+                        Subscribe to newsletter
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-bell"></i> Save Preferences</button>
+            </form>
+        </div>
+
+        <!-- Seller Application Section -->
+        <div class="settings-card" style="border-color: #ff9933;">
+            <h5><i class="fas fa-store"></i> Become a Seller</h5>
+            
+            <% if (!user.is_seller && !user.seller_status) { %>
+                <!-- Not applied yet -->
+                <p style="color: #ccc;">Apply to sell vehicles on our platform! Once approved, you'll be able to list your vehicles for sale.</p>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#sellerApplicationModal">
+                    <i class="fas fa-briefcase"></i> Apply to Become a Seller
+                </button>
+            <% } else if (user.seller_status === 'pending') { %>
+                <!-- Application pending -->
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-clock"></i> Your seller application is pending admin approval.
+                </div>
+                <p style="color: #ccc;">We're reviewing your application. You'll receive an email notification once approved.</p>
+            <% } else if (user.seller_status === 'approved' && user.is_seller) { %>
+                <!-- Approved seller -->
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle"></i> You are an approved seller!
+                </div>
+                <p style="color: #ccc;">Manage your vehicle listings from your seller dashboard.</p>
+                <a href="/seller/dashboard" class="btn btn-success"><i class="fas fa-dashboard"></i> Go to Seller Dashboard</a>
+            <% } else if (user.seller_status === 'rejected') { %>
+                <!-- Application rejected -->
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-times-circle"></i> Your seller application was not approved.
+                </div>
+                <p style="color: #ccc;">Please contact support for more information or to reapply.</p>
+            <% } else if (user.seller_status === 'suspended') { %>
+                <!-- Seller suspended -->
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-ban"></i> Your seller account has been suspended.
+                </div>
+                <p style="color: #ccc;">Contact support for more information.</p>
+            <% } %>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-card danger-zone">
+            <h5><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                <i class="fas fa-trash-alt"></i> Delete Account
+            </button>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: #1a1a1a; color: #fff;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                    <form id="deleteAccountForm" action="/settings/delete-account" method="POST">
+                        <div class="mb-3">
+                            <label for="deletePassword" class="form-label">Enter your password to confirm</label>
+                            <input type="password" class="form-control" id="deletePassword" name="password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="deleteAccountForm" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete My Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seller Application Modal -->
+    <div class="modal fade" id="sellerApplicationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: #1a1a1a; color: #fff;">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-store"></i> Apply to Become a Seller</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/settings/apply-seller" method="POST">
+                    <div class="modal-body">
+                        <p class="mb-4" style="color: #ccc;">Fill out this form to apply as a seller. An admin will review your application.</p>
+                        
+                        <div class="mb-3">
+                            <label for="businessName" class="form-label">Business Name *</label>
+                            <input type="text" class="form-control" id="businessName" name="businessName" required>
+                            <small class="form-text text-muted">Your dealership or business name</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="businessPhone" class="form-label">Business Phone *</label>
+                            <input type="text" class="form-control" id="businessPhone" name="businessPhone" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="businessAddress" class="form-label">Business Address *</label>
+                            <textarea class="form-control" id="businessAddress" name="businessAddress" rows="2" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="businessDescription" class="form-label">Tell us about your business *</label>
+                            <textarea class="form-control" id="businessDescription" name="businessDescription" rows="4" required placeholder="Describe your business, experience in vehicle sales, etc."></textarea>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the seller terms and conditions
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane"></i> Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password validation
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        confirmPasswordInput.addEventListener('input', function() {
+            if (newPasswordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity('Passwords do not match');
+            } else {
+                confirmPasswordInput.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>

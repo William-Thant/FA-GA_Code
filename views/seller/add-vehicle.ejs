@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Vehicle - Seller Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/theme.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #000000 0%, #ff3333 50%, #000000 100%);
+            padding: 3rem 0;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.4);
+            border-bottom: 4px solid #ff3333;
+        }
+
+        .page-header h1 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255, 51, 51, 0.8);
+        }
+
+        .form-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2.5rem;
+            border: 2px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .form-label {
+            color: #ff3333;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #1a1a1a;
+            border-color: #ff3333;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: #666;
+        }
+
+        .form-select option {
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #fff !important;
+            border: none;
+            padding: 1rem 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 51, 51, 0.5);
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            color: #ffffff !important;
+            border: 2px solid #555;
+            padding: 1rem 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+            border-color: #ff3333;
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload-label {
+            display: block;
+            background: #0a0a0a;
+            border: 2px dashed #333;
+            color: #999;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .file-upload-label i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .required {
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-plus-circle"></i> Add New Vehicle</h1>
+            <p class="mb-0">List a new vehicle for sale</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <%- include('../partials/messages') %>
+
+        <div class="form-card">
+            <form action="/seller/add-vehicle" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productName" class="form-label">Vehicle Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="productName" name="productName" 
+                               placeholder="e.g., 2024 Tesla Model 3" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="category" class="form-label">Category <span class="required">*</span></label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Truck">Truck</option>
+                            <option value="Sports Car">Sports Car</option>
+                            <option value="Electric">Electric</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="Luxury">Luxury</option>
+                            <option value="Van">Van</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="price" class="form-label">Price (SGD) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="price" name="price" 
+                               placeholder="e.g., 45000" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="quantity" class="form-label">Stock Quantity <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" 
+                               placeholder="e.g., 1" min="0" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="mileage" class="form-label">Mileage (Miles)</label>
+                        <input type="number" class="form-control" id="mileage" name="mileage" 
+                               placeholder="e.g., 45000" min="0" step="1">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <input type="number" class="form-control" id="year" name="year" 
+                               placeholder="e.g., 2024" min="1900" max="2100">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Vehicle Image</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" class="file-upload-input" id="image" name="image" accept="image/*">
+                        <label for="image" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload image or drag and drop</span>
+                            <small class="d-block mt-2">Maximum file size: 5MB</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-submit me-3">
+                        <i class="fas fa-check"></i> Add Vehicle
+                    </button>
+                    <a href="/seller/dashboard" class="btn btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // File upload preview
+        const fileInput = document.getElementById('image');
+        const fileLabel = document.querySelector('.file-upload-label span');
+        
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                fileLabel.textContent = e.target.files[0].name;
+            } else {
+                fileLabel.textContent = 'Click to upload image or drag and drop';
+            }
+        });
+    </script>
+</body>
+</html>

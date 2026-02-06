@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refund Management - Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .page-header { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 40px 0; 
+      margin-bottom: 40px; 
+    }
+    .order-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+    .badge-refund-none { background-color: #28a745; }
+    .badge-refund-partial { background-color: #ffc107; color: #000; }
+    .badge-refund-full { background-color: #dc3545; }
+    .refund-actions { display: flex; gap: 10px; }
+  </style>
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-undo-alt"></i> Refund Management</h1>
+    <p class="mb-0">Process refunds and manage returns</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <% if (typeof messages !== 'undefined') { %>
+    <% if (messages.error && messages.error.length) { %>
+      <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fas fa-exclamation-circle"></i> <%= messages.error.join ? messages.error.join(', ') : messages.error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <% if (messages.success && messages.success.length) { %>
+      <div class="alert alert-success alert-dismissible fade show">
+        <i class="fas fa-check-circle"></i> <%= messages.success.join ? messages.success.join(', ') : messages.success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+  <% } %>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="bg-white p-3 rounded shadow-sm">
+        <div class="row">
+          <div class="col-md-3">
+            <h5><%= orders.length %></h5>
+            <small class="text-muted">Total Orders</small>
+          </div>
+          <div class="col-md-3">
+            <h5><%= orders.filter(o => o.refundStatus === 'none').length %></h5>
+            <small class="text-muted">Not Refunded</small>
+          </div>
+          <div class="col-md-3">
+            <h5><%= orders.filter(o => o.refundStatus === 'partial').length %></h5>
+            <small class="text-muted">Partially Refunded</small>
+          </div>
+          <div class="col-md-3">
+            <h5><%= orders.filter(o => o.refundStatus === 'full').length %></h5>
+            <small class="text-muted">Fully Refunded</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (orders.length === 0) { %>
+    <div class="alert alert-info text-center">
+      <i class="fas fa-info-circle fa-2x mb-3"></i>
+      <h4>No Orders Found</h4>
+      <p>There are no orders to display.</p>
+    </div>
+  <% } else { %>
+    <% for (let order of orders) { %>
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <h5 class="mb-1"><i class="fas fa-receipt"></i> <%= order.orderId %></h5>
+            <small class="text-muted">
+              <%= new Date(order.orderDate).toLocaleString('en-SG') %>
+            </small>
+          </div>
+          <div>
+            <% if (order.refundStatus === 'none') { %>
+              <span class="badge badge-refund-none">Not Refunded</span>
+            <% } else if (order.refundStatus === 'partial') { %>
+              <span class="badge badge-refund-partial">Partially Refunded</span>
+            <% } else { %>
+              <span class="badge badge-refund-full">Fully Refunded</span>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-user"></i> Customer</h6>
+            <p class="mb-2"><strong><%= order.userName %></strong></p>
+            <p class="mb-2 text-muted"><%= order.userEmail %></p>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="fas fa-credit-card"></i> Payment</h6>
+            <p class="mb-2">
+              <% if (order.paymentProvider === 'PayPal') { %>
+                <i class="fab fa-paypal text-primary"></i> PayPal
+              <% } else if (order.paymentProvider === 'Stripe') { %>
+                <i class="fab fa-stripe text-info"></i> Stripe
+              <% } else { %>
+                <i class="fas fa-credit-card"></i> <%= order.paymentProvider || 'N/A' %>
+              <% } %>
+            </p>
+            <% if (order.paymentReference) { %>
+              <small class="text-muted">Ref: <%= order.paymentReference.substring(0, 25) %>...</small>
+            <% } %>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col-md-8">
+            <h6><i class="fas fa-box"></i> Items</h6>
+            <ul class="list-unstyled">
+              <% for (let item of order.items) { %>
+                <li class="mb-1">
+                  <%= item.productName %> × <%= item.quantity %> - $<%= (item.price * item.quantity).toFixed(2) %>
+                </li>
+              <% } %>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6><i class="fas fa-calculator"></i> Totals</h6>
+            <div class="d-flex justify-content-between mb-1">
+              <span>Subtotal:</span>
+              <span>$<%= order.subtotal.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span>Tax:</span>
+              <span>$<%= order.tax.toFixed(2) %></span>
+            </div>
+            <div class="d-flex justify-content-between mb-1 fw-bold">
+              <span>Total:</span>
+              <span class="text-success">$<%= order.total.toFixed(2) %></span>
+            </div>
+            <% if (order.refundedAmount > 0) { %>
+              <div class="d-flex justify-content-between mb-1 text-danger">
+                <span>Refunded:</span>
+                <span>-$<%= order.refundedAmount.toFixed(2) %></span>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="refund-actions">
+          <% if (order.refundStatus !== 'full' && order.paymentProvider) { %>
+            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#refundModal<%= order.orderId %>">
+              <i class="fas fa-undo-alt"></i> 
+              <%= order.refundStatus === 'none' ? 'Process Refund' : 'Process Additional Refund' %>
+            </button>
+          <% } else if (order.refundStatus === 'full') { %>
+            <button class="btn btn-secondary btn-sm" disabled>
+              <i class="fas fa-check"></i> Fully Refunded
+            </button>
+          <% } else { %>
+            <span class="text-muted"><i class="fas fa-info-circle"></i> Manual refund required for <%= order.paymentProvider || 'this payment method' %></span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Refund Modal -->
+      <div class="modal fade" id="refundModal<%= order.orderId %>" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Process Refund - <%= order.orderId %></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/admin/refunds/process" method="POST">
+              <div class="modal-body">
+                <input type="hidden" name="orderId" value="<%= order.orderId %>">
+                
+                <div class="mb-3">
+                  <label class="form-label">Refund Type</label>
+                  <select class="form-select" name="refundType" id="refundType<%= order.orderId %>" required>
+                    <option value="full">Full Refund ($<%= (order.total - order.refundedAmount).toFixed(2) %>)</option>
+                    <option value="partial">Partial Refund</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3" id="partialAmount<%= order.orderId %>" style="display: none;">
+                  <label class="form-label">Refund Amount</label>
+                  <input type="number" class="form-control" name="refundAmount" 
+                         min="0.01" max="<%= (order.total - order.refundedAmount).toFixed(2) %>" 
+                         step="0.01" placeholder="Enter amount">
+                  <small class="text-muted">Maximum: $<%= (order.total - order.refundedAmount).toFixed(2) %></small>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Reason for Refund</label>
+                  <textarea class="form-control" name="reason" rows="3" required placeholder="Enter reason for refund..."></textarea>
+                </div>
+
+                <% if (order.paymentProvider === 'NETS') { %>
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>NETS Refund:</strong> 
+                    This refund will be tracked in the system, but you must manually process it through your NETS Merchant Portal.
+                    Use the transaction reference: <strong><%= order.paymentReference %></strong>
+                  </div>
+                <% } %>
+                
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" name="refundToWallet" id="refundToWallet<%= order.orderId %>">
+                  <label class="form-check-label" for="refundToWallet<%= order.orderId %>">
+                    <i class="fas fa-wallet text-primary"></i> Refund to customer's wallet (instant)
+                  </label>
+                  <small class="d-block text-muted ms-4">Faster for customer, encourages repeat purchases</small>
+                </div>
+                
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="restoreInventory" id="restoreInventory<%= order.orderId %>" checked>
+                  <label class="form-check-label" for="restoreInventory<%= order.orderId %>">
+                    Restore items to inventory
+                  </label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-undo-alt"></i> Process Refund
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.getElementById('refundType<%= order.orderId %>').addEventListener('change', function() {
+          const partialDiv = document.getElementById('partialAmount<%= order.orderId %>');
+          if (this.value === 'partial') {
+            partialDiv.style.display = 'block';
+          } else {
+            partialDiv.style.display = 'none';
+          }
+        });
+      </script>
+    <% } %>
+  <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

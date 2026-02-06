@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Analytics - Seller Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff !important;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #000000 0%, #ff3333 50%, #000000 100%);
+            padding: 3rem 0;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.4);
+            border-bottom: 4px solid #ff3333;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255, 51, 51, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            border-color: #ff3333;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 51, 51, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ff3333;
+            margin: 0;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .filter-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #333;
+        }
+
+        .filter-section h5 {
+            color: #ff3333;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .form-label {
+            color: #ffffff !important;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background: #0a0a0a !important;
+            border: 2px solid #333 !important;
+            color: #ffffff !important;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #1a1a1a !important;
+            border-color: #ff3333 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .form-select option {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            border: none;
+            color: #ffffff !important;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 51, 51, 0.4);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+            border: none;
+            color: #ffffff !important;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .analytics-table {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #333;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-table table {
+            margin-bottom: 0;
+            color: #ffffff;
+        }
+
+        .analytics-table thead {
+            background: rgba(255, 51, 51, 0.1);
+            border-bottom: 2px solid #ff3333;
+        }
+
+        .analytics-table th {
+            color: #ff3333 !important;
+            font-weight: 700;
+            padding: 1.5rem !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .analytics-table td {
+            padding: 1rem !important;
+            border-bottom: 1px solid #333;
+            color: #ccc;
+        }
+
+        .analytics-table tbody tr:hover {
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        .vehicle-name {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        .vehicle-image {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .badge-views {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .badge-visitors {
+            background: linear-gradient(135deg, #00d4ff 0%, #0088cc 100%);
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            color: #ff3333;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #ff3333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .vehicle-details {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .price-badge {
+            background: rgba(255, 51, 51, 0.1);
+            color: #ff3333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="dashboard-header">
+        <div class="container">
+            <h1><i class="fas fa-chart-bar"></i> Vehicle Analytics</h1>
+            <p>Track vehicle views and visitor insights</p>
+        </div>
+    </div>
+
+    <div class="container" style="margin-bottom: 3rem;">
+        <!-- Statistics Cards -->
+        <div class="row mb-4" id="stats-container">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <p class="stat-value" id="stat-total-views">0</p>
+                    <p class="stat-label"><i class="fas fa-eye"></i> Total Views</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <p class="stat-value" id="stat-unique-visitors">0</p>
+                    <p class="stat-label"><i class="fas fa-users"></i> Unique Visitors</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <p class="stat-value" id="stat-vehicles-viewed">0</p>
+                    <p class="stat-label"><i class="fas fa-car"></i> Vehicles Viewed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <p class="stat-value" id="stat-avg-duration">0s</p>
+                    <p class="stat-label"><i class="fas fa-clock"></i> Avg Duration</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h5><i class="fas fa-filter"></i> Filter Results</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="filter-start-date">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="filter-end-date">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fuel Type</label>
+                    <select class="form-select" id="filter-fuel-type">
+                        <option value="all">All Types</option>
+                        <option value="Gasoline">Gasoline</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Electric">Electric</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="LPG">LPG</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Mileage Range</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="filter-min-mileage" placeholder="Min">
+                        <input type="number" class="form-control" id="filter-max-mileage" placeholder="Max">
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-filter" onclick="applyFilters()">
+                        <i class="fas fa-search"></i> Apply Filters
+                    </button>
+                    <button class="btn btn-reset ms-2" onclick="resetFilters()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Table -->
+        <div class="analytics-table">
+            <div id="analytics-content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading analytics...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFilters = {
+            startDate: null,
+            endDate: null,
+            minMileage: null,
+            maxMileage: null,
+            fuelType: 'all'
+        };
+
+        // Load analytics on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalytics();
+            loadSummary();
+        });
+
+        async function loadSummary() {
+            try {
+                const params = new URLSearchParams();
+                if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
+                if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+
+                const response = await fetch(`/api/seller/analytics/summary?${params}`);
+                const data = await response.json();
+
+                document.getElementById('stat-total-views').textContent = data.total_views || 0;
+                document.getElementById('stat-unique-visitors').textContent = data.unique_visitors || 0;
+                document.getElementById('stat-vehicles-viewed').textContent = data.vehicles_viewed || 0;
+                
+                const avgDuration = data.avg_duration ? Math.round(data.avg_duration) : 0;
+                document.getElementById('stat-avg-duration').textContent = avgDuration + 's';
+            } catch (error) {
+                console.error('Error loading summary:', error);
+            }
+        }
+
+        async function loadAnalytics() {
+            const analyticsContent = document.getElementById('analytics-content');
+            
+            try {
+                const params = new URLSearchParams();
+                if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
+                if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+                if (currentFilters.minMileage) params.append('minMileage', currentFilters.minMileage);
+                if (currentFilters.maxMileage) params.append('maxMileage', currentFilters.maxMileage);
+                if (currentFilters.fuelType !== 'all') params.append('fuelType', currentFilters.fuelType);
+
+                const response = await fetch(`/api/seller/analytics?${params}`);
+                const data = await response.json();
+
+                if (!data.vehicles || data.vehicles.length === 0) {
+                    analyticsContent.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            <h4>No Analytics Data</h4>
+                            <p>No vehicles found matching your filters</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Fuel Type</th>
+                                <th>Mileage</th>
+                                <th>Price</th>
+                                <th>Total Views</th>
+                                <th>Unique Visitors</th>
+                                <th>Days Viewed</th>
+                                <th>Last View</th>
+                                <th>Avg Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                data.vehicles.forEach(vehicle => {
+                    const lastView = vehicle.last_view ? new Date(vehicle.last_view).toLocaleDateString() : 'N/A';
+                    const avgDuration = vehicle.avg_view_duration ? Math.round(vehicle.avg_view_duration) + 's' : 'N/A';
+
+                    html += `
+                        <tr>
+                            <td>
+                                <img src="/images/${vehicle.image || 'default-car.svg'}" class="vehicle-image" 
+                                     onerror="this.src='/images/default-car.svg'">
+                                <span class="vehicle-name">${vehicle.productName}</span>
+                            </td>
+                            <td><span>${vehicle.fuel_type || 'N/A'}</span></td>
+                            <td><span>${vehicle.mileage ? vehicle.mileage.toLocaleString() + ' km' : 'N/A'}</span></td>
+                            <td><span class="price-badge">$${vehicle.price.toFixed(2)}</span></td>
+                            <td><span class="badge-views">${vehicle.total_views}</span></td>
+                            <td><span class="badge-visitors">${vehicle.unique_visitors}</span></td>
+                            <td><span>${vehicle.days_viewed || 0}</span></td>
+                            <td><span>${lastView}</span></td>
+                            <td><span>${avgDuration}</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+                `;
+
+                analyticsContent.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                analyticsContent.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h4>Error Loading Analytics</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function applyFilters() {
+            currentFilters.startDate = document.getElementById('filter-start-date').value || null;
+            currentFilters.endDate = document.getElementById('filter-end-date').value || null;
+            currentFilters.minMileage = document.getElementById('filter-min-mileage').value || null;
+            currentFilters.maxMileage = document.getElementById('filter-max-mileage').value || null;
+            currentFilters.fuelType = document.getElementById('filter-fuel-type').value || 'all';
+
+            loadAnalytics();
+            loadSummary();
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-start-date').value = '';
+            document.getElementById('filter-end-date').value = '';
+            document.getElementById('filter-min-mileage').value = '';
+            document.getElementById('filter-max-mileage').value = '';
+            document.getElementById('filter-fuel-type').value = 'all';
+
+            currentFilters = {
+                startDate: null,
+                endDate: null,
+                minMileage: null,
+                maxMileage: null,
+                fuelType: 'all'
+            };
+
+            loadAnalytics();
+            loadSummary();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - Car Dealership</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/theme.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #000000 0%, #ff3333 50%, #000000 100%);
+            padding: 3rem 0;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.4);
+            border-bottom: 4px solid #ff3333;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255, 51, 51, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 51, 51, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            border-color: #ff3333;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 51, 51, 0.3);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ff3333;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+        }
+
+        .stat-label {
+            color: #ffffff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .stat-label i {
+            color: #ff3333;
+            margin-right: 0.5rem;
+        }
+
+        .content-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .content-card h3 {
+            color: #ff3333;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .vehicle-table {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .vehicle-table thead {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #ffffff;
+        }
+
+        .vehicle-table thead th {
+            border: none;
+            padding: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+        }
+
+        .vehicle-table tbody tr {
+            background: #1a1a1a !important;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-table tbody tr:hover {
+            background: #2a2a2a !important;
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.2);
+            transform: translateX(5px);
+        }
+
+        .vehicle-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            color: #ffffff !important;
+            background: transparent !important;
+            border-color: #333 !important;
+        }
+
+        .table-responsive .vehicle-table {
+            background: transparent;
+        }
+
+        .vehicle-img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #333;
+            transition: all 0.3s;
+        }
+
+        .vehicle-img:hover {
+            border-color: #ff3333;
+            transform: scale(1.1);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000;
+        }
+
+        .status-sold-out {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #fff;
+        }
+
+        .btn-racing {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #fff !important;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .btn-racing:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 51, 51, 0.5);
+            color: #fff !important;
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            color: #ffffff !important;
+            border: 2px solid #555;
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #555 0%, #333 100%);
+            color: #ffffff !important;
+            border-color: #ff3333;
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            margin: 0.2rem;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action i {
+            color: #ffffff !important;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .profile-info {
+            margin-bottom: 1.2rem;
+        }
+
+        .profile-label {
+            color: #ff3333;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .profile-value {
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .content-card .table-responsive {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%) !important;
+            border-radius: 10px;
+            border: 2px solid #333;
+            padding: 0;
+        }
+
+        .content-card .table {
+            background-color: transparent !important;
+            color: #ffffff;
+            margin-bottom: 0;
+        }
+
+        .orders-table {
+            background: transparent !important;
+            color: #ffffff;
+        }
+
+        .orders-table thead {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%) !important;
+            color: #ffffff;
+        }
+
+        .orders-table thead th {
+            padding: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: transparent !important;
+            color: #ffffff !important;
+            border-color: #333 !important;
+        }
+
+        .orders-table tbody tr {
+            background-color: transparent !important;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .orders-table tbody tr:hover {
+            background-color: rgba(255, 51, 51, 0.1) !important;
+        }
+
+        .orders-table tbody td {
+            padding: 1rem;
+            color: #ffffff;
+            background-color: transparent !important;
+            border-color: #333 !important;
+        }
+
+        .text-muted {
+            color: #ffffff !important;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        small {
+            color: #ffffff !important;
+        }
+
+        p {
+            color: #ffffff;
+        }
+
+        .btn-outline-light {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .btn-outline-light:hover {
+            color: #000;
+            background-color: #ffffff;
+        }
+
+        #profile-edit .form-control, 
+        #profile-edit .form-control:focus {
+            background: #0a0a0a;
+            border: 2px solid #333;
+            color: #ffffff;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        #profile-edit .form-control:focus {
+            border-color: #ff3333;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        #profile-edit textarea.form-control {
+            resize: vertical;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            color: #000 !important;
+            border: none;
+            font-weight: 700;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #00cc00 0%, #009900 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="dashboard-header">
+        <div class="container">
+            <h1><i class="fas fa-store"></i> Seller Dashboard</h1>
+            <p class="mb-0">Manage your vehicle listings and track your sales</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <%- include('../partials/messages') %>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="/seller/add-vehicle" class="btn btn-racing btn-lg">
+                    <i class="fas fa-plus-circle"></i> Add New Vehicle
+                </a>
+                <a href="/shop?seller=<%= user.userId || user.id %>" class="btn btn-secondary btn-lg ms-2">
+                    <i class="fas fa-eye"></i> View My Listings
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value"><%= statistics.totalVehicles %></div>
+                    <div class="stat-label"><i class="fas fa-car"></i> Total Vehicles</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value"><%= statistics.activeListings %></div>
+                    <div class="stat-label"><i class="fas fa-check-circle"></i> Active Listings</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value"><%= statistics.outOfStock %></div>
+                    <div class="stat-label"><i class="fas fa-times-circle"></i> Sold Out</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value"><%= statistics.totalViews %></div>
+                    <div class="stat-label"><i class="fas fa-eye"></i> Total Views</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value"><%= statistics.totalSales %></div>
+                    <div class="stat-label"><i class="fas fa-shopping-cart"></i> Total Sales</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">$<%= statistics.totalRevenue.toFixed(2) %></div>
+                    <div class="stat-label"><i class="fas fa-dollar-sign"></i> Total Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Profile -->
+        <% if (sellerProfile) { %>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="profile-card">
+                    <h3><i class="fas fa-building"></i> Business Profile</h3>
+                    
+                    <!-- View Mode -->
+                    <div id="profile-view">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="profile-info">
+                                    <div class="profile-label">Business Name</div>
+                                    <div class="profile-value"><%= sellerProfile.business_name %></div>
+                                </div>
+                                <div class="profile-info">
+                                    <div class="profile-label">Contact Phone</div>
+                                    <div class="profile-value"><%= sellerProfile.business_phone %></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="profile-info">
+                                    <div class="profile-label">Business Address</div>
+                                    <div class="profile-value"><%= sellerProfile.business_address %></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-label">Description</div>
+                            <div class="profile-value"><%= sellerProfile.business_description %></div>
+                        </div>
+                        <button onclick="toggleEditMode(true)" class="btn btn-outline-light btn-sm mt-3">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                    </div>
+
+                    <!-- Edit Mode -->
+                    <div id="profile-edit" style="display: none;">
+                        <form id="profile-form" method="POST" action="/seller/update-profile">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="profile-label">Business Name</label>
+                                    <input type="text" class="form-control" name="business_name" 
+                                           value="<%= sellerProfile.business_name %>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="profile-label">Contact Phone</label>
+                                    <input type="text" class="form-control" name="business_phone" 
+                                           value="<%= sellerProfile.business_phone %>" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="profile-label">Business Address</label>
+                                    <input type="text" class="form-control" name="business_address" 
+                                           value="<%= sellerProfile.business_address %>" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="profile-label">Description</label>
+                                    <textarea class="form-control" name="business_description" 
+                                              rows="3" required><%= sellerProfile.business_description %></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm me-2">
+                                <i class="fas fa-check"></i> Save Changes
+                            </button>
+                            <button type="button" onclick="toggleEditMode(false)" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- My Vehicles -->
+        <div class="content-card">
+            <h3><i class="fas fa-car-side"></i> My Vehicle Listings</h3>
+            
+            <% if (vehicles.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #666;"></i>
+                    <p class="text-muted">You haven't listed any vehicles yet</p>
+                    <a href="/seller/add-vehicle" class="btn btn-racing mt-3">
+                        <i class="fas fa-plus-circle"></i> List Your First Vehicle
+                    </a>
+                </div>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table vehicle-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Vehicle</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% vehicles.forEach(vehicle => { %>
+                                <tr>
+                                    <td>
+                                        <% 
+                                            let imgUrl = '/images/default-car.jpg';
+                                            if (vehicle.image) {
+                                                imgUrl = '/images/' + vehicle.image;
+                                            }
+                                        %>
+                                        <img src="<%= imgUrl %>" 
+                                             alt="<%= vehicle.productName %>" 
+                                             class="vehicle-img">
+                                    </td>
+                                    <td>
+                                        <strong><%= vehicle.productName %></strong><br>
+                                        <small class="text-muted"><%= vehicle.category || 'Sedan' %></small>
+                                    </td>
+                                    <td>
+                                        <strong>$<%= parseFloat(vehicle.price).toLocaleString() %></strong>
+                                    </td>
+                                    <td>
+                                        <%= vehicle.quantity %>
+                                    </td>
+                                    <td>
+                                        <% if (vehicle.quantity > 0) { %>
+                                            <span class="status-badge status-active">
+                                                <i class="fas fa-check"></i> Active
+                                            </span>
+                                        <% } else { %>
+                                            <span class="status-badge status-sold-out">
+                                                <i class="fas fa-times"></i> Sold Out
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="/product/<%= vehicle.id %>" 
+                                           class="btn btn-sm btn-info btn-action" 
+                                           title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/seller/vehicle/<%= vehicle.id %>/edit" 
+                                           class="btn btn-sm btn-warning btn-action"
+                                           title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <% if (vehicle.stockQuantity > 0) { %>
+                                            <form method="POST" 
+                                                  action="/seller/vehicle/<%= vehicle.id %>/mark-sold" 
+                                                  style="display: inline;">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-secondary btn-action"
+                                                        title="Mark as Sold">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                        <form method="POST" 
+                                              action="/seller/vehicle/<%= vehicle.id %>/delete" 
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Are you sure you want to delete this vehicle?');">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-danger btn-action"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Refund Requests -->
+        <div class="content-card" id="refund-requests-section">
+            <h3><i class="fas fa-undo"></i> Refund Requests</h3>
+            <div id="refund-requests-container">
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-spinner fa-spin"></i> Loading refund requests...
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <% if (recentOrders.length > 0) { %>
+        <div class="content-card">
+            <h3><i class="fas fa-receipt"></i> Recent Sales</h3>
+            <div class="table-responsive">
+                <table class="table orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Vehicle</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentOrders.forEach(order => { %>
+                            <tr>
+                                <td>#<%= order.orderId %></td>
+                                <td>
+                                    <% 
+                                        let orderImgUrl = '/images/default-car.jpg';
+                                        if (order.image) {
+                                            orderImgUrl = '/images/' + order.image;
+                                        }
+                                    %>
+                                    <img src="<%= orderImgUrl %>" 
+                                         alt="<%= order.productName %>" 
+                                         class="vehicle-img me-2"
+                                         style="width: 60px; height: 45px;">
+                                    <%= order.productName %>
+                                </td>
+                                <td>
+                                    <strong><%= order.customerName %></strong><br>
+                                    <small class="text-muted"><%= order.customerEmail %></small>
+                                </td>
+                                <td><%= new Date(order.orderDate).toLocaleDateString() %></td>
+                                <td><strong>$<%= parseFloat(order.total).toFixed(2) %></strong></td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <i class="fas fa-check"></i> Completed
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleEditMode(editing) {
+            const viewMode = document.getElementById('profile-view');
+            const editMode = document.getElementById('profile-edit');
+            
+            if (editing) {
+                viewMode.style.display = 'none';
+                editMode.style.display = 'block';
+            } else {
+                viewMode.style.display = 'block';
+                editMode.style.display = 'none';
+            }
+        }
+
+        // Load refund requests
+        async function loadRefundRequests() {
+            try {
+                const response = await fetch('/seller/refund-requests');
+                const data = await response.json();
+                
+                const container = document.getElementById('refund-requests-container');
+                
+                if (data.requests && data.requests.length > 0) {
+                    const pendingRequests = data.requests.filter(r => r.status === 'pending');
+                    const processedRequests = data.requests.filter(r => r.status !== 'pending');
+                    
+                    let html = '';
+                    
+                    if (pendingRequests.length > 0) {
+                        html += '<h5 class="text-warning mb-3"><i class="fas fa-clock"></i> Pending Requests</h5>';
+                        html += '<div class="table-responsive">';
+                        html += '<table class="table orders-table">';
+                        html += '<thead><tr><th>Customer</th><th>Product</th><th>Amount</th><th>Reason</th><th>Date</th><th>Actions</th></tr></thead>';
+                        html += '<tbody>';
+                        
+                        pendingRequests.forEach(req => {
+                            html += `
+                                <tr>
+                                    <td>
+                                        <strong>${req.customerName}</strong><br>
+                                        <small class="text-muted">${req.customerEmail}</small>
+                                    </td>
+                                    <td>
+                                        <img src="/images/${req.image}" alt="${req.productName}" 
+                                             class="vehicle-img me-2" style="width: 60px; height: 45px;"
+                                             onerror="this.src='/images/default-car.svg'">
+                                        ${req.productName}
+                                    </td>
+                                    <td><strong>$${parseFloat(req.amount).toFixed(2)}</strong><br>
+                                        <small class="text-muted">Commission: $${parseFloat(req.admin_commission).toFixed(2)}</small>
+                                    </td>
+                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+                                        title="${req.reason}">${req.reason}</td>
+                                    <td>${new Date(req.requested_at).toLocaleDateString()}</td>
+                                    <td>
+                                        <form method="POST" action="/seller/refund/${req.id}/approve" style="display: inline;">
+                                            <div class="form-check form-check-inline mb-2">
+                                                <input class="form-check-input" type="checkbox" name="restoreInventory" value="1" id="restore-${req.id}">
+                                                <label class="form-check-label" for="restore-${req.id}" style="color: #999;">
+                                                    Restore Stock
+                                                </label>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRefund(${req.id})">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    }
+                    
+                    if (processedRequests.length > 0) {
+                        html += '<h5 class="text-muted mt-4 mb-3"><i class="fas fa-history"></i> Recent Activity</h5>';
+                        html += '<div class="table-responsive">';
+                        html += '<table class="table orders-table">';
+                        html += '<thead><tr><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>';
+                        html += '<tbody>';
+                        
+                        processedRequests.slice(0, 5).forEach(req => {
+                            const statusClass = req.status === 'approved' ? 'success' : req.status === 'rejected' ? 'danger' : 'secondary';
+                            const statusIcon = req.status === 'approved' ? 'check' : req.status === 'rejected' ? 'times' : 'clock';
+                            
+                            html += `
+                                <tr>
+                                    <td><strong>${req.customerName}</strong></td>
+                                    <td>${req.productName}</td>
+                                    <td>$${parseFloat(req.amount).toFixed(2)}</td>
+                                    <td><span class="badge bg-${statusClass}"><i class="fas fa-${statusIcon}"></i> ${req.status.toUpperCase()}</span></td>
+                                    <td>${new Date(req.processed_at || req.requested_at).toLocaleDateString()}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += '</tbody></table></div>';
+                    }
+                    
+                    if (pendingRequests.length === 0 && processedRequests.length === 0) {
+                        html = '<div class="text-center text-muted py-4"><i class="fas fa-inbox"></i> No refund requests yet</div>';
+                    }
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-inbox"></i> No refund requests yet</div>';
+                }
+            } catch (error) {
+                console.error('Error loading refund requests:', error);
+                document.getElementById('refund-requests-container').innerHTML = 
+                    '<div class="alert alert-danger">Error loading refund requests</div>';
+            }
+        }
+
+        function rejectRefund(refundId) {
+            const reason = prompt('Please provide a reason for rejection:');
+            if (reason) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/seller/refund/${refundId}/reject`;
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'rejectionReason';
+                input.value = reason;
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Load refund requests on page load
+        document.addEventListener('DOMContentLoaded', loadRefundRequests);
+    </script>
+</body>
+</html>

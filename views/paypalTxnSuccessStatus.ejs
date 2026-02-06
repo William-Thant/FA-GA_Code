@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Isaac's Cardealership</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 20px;
+            border: 2px solid #333;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            padding: 60px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 80px;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease-out;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.7);
+        }
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        .message {
+            color: #a8a8a8;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+        .order-id {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff3333;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .order-id strong {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .payment-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid #ff3333;
+        }
+        .btn-container {
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            border: 2px solid;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: white;
+            border-color: #ff3333;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #ffffff;
+            border-color: #333;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            border-color: #ff3333;
+            transform: translateY(-2px);
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✓</div>
+        <h1>Payment Successful!</h1>
+        <div class="payment-badge">PayPal Payment</div>
+        <p class="message"><%= message %></p>
+        
+        <% if (typeof orderId !== 'undefined') { %>
+            <div class="order-id">
+                <strong>Order ID:</strong> <%= orderId %>
+            </div>
+        <% } %>
+        
+        <p style="color: #00d4ff; font-size: 0.95rem; margin-top: 20px; font-weight: 600;">
+            <i class="fas fa-envelope" style="margin-right: 8px;"></i>A receipt has been sent to your email address.
+        </p>
+        
+        <div class="btn-container">
+            <a href="/shop" class="btn btn-primary">Continue Shopping</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

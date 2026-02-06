@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Isaac's Cardealership</title>
+    <script src="https://unpkg.com/event-source-polyfill"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 20px;
+            border: 2px solid #333;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        #status {
+            color: #a8a8a8;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .qr-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff3333;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: inline-block;
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+        }
+        .qr-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        #timer {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .info-image {
+            max-width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 2px solid #333;
+        }
+        .cancel-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            border: 2px solid #ff3333;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        .cancel-link:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.5);
+        }
+        .loading {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border: 4px solid rgba(0, 212, 255, 0.3);
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💳 Scan to Pay</h1>
+        <p id="status">Scan the QR code with your bank app to complete payment</p>
+        
+        <div class="total-amount">$<%= total.toFixed(2) %></div>
+        
+        <div class="qr-container">
+            <img src="<%= qrCodeUrl %>" alt="QR Code for Payment" />
+        </div>
+        
+        <p id="timer">Time remaining: 5: 00</p>
+        <div class="loading"></div>
+        
+        <% if (typeof networkCode !== 'undefined' && networkCode !== 0) { %>
+            <p style="color: red; font-weight: bold;">Network Status: <%= networkCode %></p>
+        <% } %>
+        
+        <img class="info-image" src="/images/netsQrInfo.png" alt="NETS Payment Info" onerror="this.style.display='none'" />
+        
+        <% if (typeof type !== 'undefined' && type === 'wallet_topup') { %>
+            <a href="/wallet/topup" class="cancel-link">Cancel Payment</a>
+        <% } else { %>
+            <a href="/cart" class="cancel-link">Cancel Payment</a>
+        <% } %>
+    </div>
+
+    <script>
+        let s2sNetsTxnStatus;
+
+        if (s2sNetsTxnStatus) {
+            s2sNetsTxnStatus.close();
+        }
+
+        const txnRetrievalRef = "<%= txnRetrievalRef %>";
+        const url = `/sse/payment-status/${txnRetrievalRef}`; 
+   
+        const headers = {
+            "api-key": "<%= apiKey %>",
+            "project-id": "<%= projectId %>",
+        };
+
+        console.log("NETS REQUEST response:", <%- JSON.stringify(fullNetsResponse) %>);
+
+        // Initialize EventSourcePolyfill with headers
+        s2sNetsTxnStatus = new EventSourcePolyfill(url, {
+            headers: headers,
+            heartbeatTimeout: 150000,
+        });
+
+        s2sNetsTxnStatus.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+            console.log("NETS Query Response:", data);
+
+            // Check for payment success
+            if (data.success) {
+                if (s2sNetsTxnStatus) s2sNetsTxnStatus.close();
+                window.location.href = `/nets-qr/success?txn_retrieval_ref=${txnRetrievalRef}`;
+            } else if (data.fail) {
+                if (s2sNetsTxnStatus) s2sNetsTxnStatus.close();
+                window.location.href = `/nets-qr/fail?txn_retrieval_ref=${txnRetrievalRef}`;
+            }
+        });
+
+        console.log("Initialized EventSourcePolyfill");
+
+        // Countdown Timer Logic
+        const timerElement = document.getElementById("timer");
+        const countdownDuration = 300; // 5 minutes in seconds
+        let remainingTime = countdownDuration;
+
+        const updateTimer = () => {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timerElement.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, "0")}`;
+            remainingTime--;
+
+            if (remainingTime < 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "Transaction timed out.";
+
+                if (s2sNetsTxnStatus) {
+                    s2sNetsTxnStatus.close();
+                }
+                window.location.href = `/nets-qr/fail?txn_retrieval_ref=${txnRetrievalRef}`;
+            }
+        };
+
+        // Start the timer
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call to set the timer immediately
+    </script>
+</body>
+</html>

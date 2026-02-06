@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#1a1a1a"/>
+  
+  <!-- Car body -->
+  <path d="M 200 350 Q 200 320 230 300 L 350 300 Q 370 300 380 280 L 450 280 Q 460 280 460 300 L 580 300 Q 610 300 610 330 L 610 380 Q 610 400 590 400 L 210 400 Q 190 400 190 380 Z" fill="#ff3333"/>
+  
+  <!-- Car windows -->
+  <path d="M 360 300 L 380 285 L 445 285 L 455 300 Z" fill="#333333" opacity="0.7"/>
+  <path d="M 250 310 L 340 310 L 350 295 L 240 295 Z" fill="#333333" opacity="0.7"/>
+  
+  <!-- Wheels -->
+  <circle cx="280" cy="400" r="40" fill="#222222"/>
+  <circle cx="280" cy="400" r="25" fill="#444444"/>
+  <circle cx="520" cy="400" r="40" fill="#222222"/>
+  <circle cx="520" cy="400" r="25" fill="#444444"/>
+  
+  <!-- Details -->
+  <rect x="220" y="360" width="30" height="15" rx="3" fill="#ffcc00"/>
+  <rect x="550" y="360" width="30" height="15" rx="3" fill="#ff0000"/>
+  
+  <!-- Text -->
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="24" fill="#999999" text-anchor="middle">No Image Available</text>
+</svg>

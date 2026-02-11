@@ -139,16 +139,33 @@ const SellerController = {
                 return res.redirect('/seller/dashboard');
             }
 
-            // Delete the vehicle
-            db.query('DELETE FROM products WHERE id = ?', [vehicleId], (deleteErr) => {
-                if (deleteErr) {
-                    console.error('Error deleting vehicle:', deleteErr);
-                    req.flash('error', 'Failed to delete vehicle');
+            // Clean up dependent rows (refund_requests -> vehicle_views) before deleting vehicle
+            db.query('DELETE FROM refund_requests WHERE product_id = ?', [vehicleId], (refundErr) => {
+                if (refundErr) {
+                    console.error('Error deleting refund requests:', refundErr);
+                    req.flash('error', 'Failed to delete vehicle refunds');
                     return res.redirect('/seller/dashboard');
                 }
 
-                req.flash('success', 'Vehicle deleted successfully');
-                res.redirect('/seller/dashboard');
+                db.query('DELETE FROM vehicle_views WHERE vehicle_id = ?', [vehicleId], (viewsErr) => {
+                    if (viewsErr) {
+                        console.error('Error deleting vehicle view analytics:', viewsErr);
+                        req.flash('error', 'Failed to delete vehicle analytics');
+                        return res.redirect('/seller/dashboard');
+                    }
+
+                    // Delete the vehicle
+                    db.query('DELETE FROM products WHERE id = ?', [vehicleId], (deleteErr) => {
+                        if (deleteErr) {
+                            console.error('Error deleting vehicle:', deleteErr);
+                            req.flash('error', 'Failed to delete vehicle');
+                            return res.redirect('/seller/dashboard');
+                        }
+
+                        req.flash('success', 'Vehicle deleted successfully');
+                        res.redirect('/seller/dashboard');
+                    });
+                });
             });
         });
     },
@@ -189,10 +206,36 @@ const SellerController = {
     showAddVehicleForm(req, res) {
         res.render('seller/add-vehicle', {
             user: req.session.user,
+            isEdit: false,
+            vehicle: null,
             messages: {
                 success: req.flash('success'),
                 error: req.flash('error')
             }
+        });
+    },
+
+    // Show edit vehicle form
+    showEditVehicleForm(req, res) {
+        const userId = req.session.user.userId || req.session.user.id;
+        const vehicleId = req.params.id;
+
+        db.query('SELECT * FROM products WHERE id = ? AND seller_id = ?', [vehicleId, userId], (err, results) => {
+            if (err || results.length === 0) {
+                console.error('Error fetching vehicle for edit:', err);
+                req.flash('error', 'Vehicle not found or access denied');
+                return res.redirect('/seller/dashboard');
+            }
+
+            res.render('seller/add-vehicle', {
+                user: req.session.user,
+                isEdit: true,
+                vehicle: results[0],
+                messages: {
+                    success: req.flash('success'),
+                    error: req.flash('error')
+                }
+            });
         });
     },
 
@@ -220,6 +263,39 @@ const SellerController = {
 
             req.flash('success', 'Vehicle added successfully!');
             res.redirect('/seller/dashboard');
+        });
+    },
+
+    // Handle update vehicle submission
+    updateVehicle(req, res) {
+        const { productName, price, quantity, category, mileage, year } = req.body;
+        const userId = req.session.user.userId || req.session.user.id;
+        const vehicleId = req.params.id;
+
+        db.query('SELECT * FROM products WHERE id = ? AND seller_id = ?', [vehicleId, userId], (err, results) => {
+            if (err || results.length === 0) {
+                console.error('Error verifying vehicle for update:', err);
+                req.flash('error', 'Vehicle not found or access denied');
+                return res.redirect('/seller/dashboard');
+            }
+
+            const existing = results[0];
+            const image = req.file ? req.file.filename : existing.image;
+
+            const sql = `UPDATE products 
+                         SET productName = ?, price = ?, quantity = ?, category = ?, mileage = ?, year = ?, image = ?
+                         WHERE id = ?`;
+
+            db.query(sql, [productName, price, quantity, category, mileage || null, year || null, image, vehicleId], (updateErr) => {
+                if (updateErr) {
+                    console.error('Error updating vehicle:', updateErr);
+                    req.flash('error', 'Failed to update vehicle');
+                    return res.redirect(`/seller/vehicle/${vehicleId}/edit`);
+                }
+
+                req.flash('success', 'Vehicle updated successfully!');
+                res.redirect('/seller/dashboard');
+            });
         });
     },
 

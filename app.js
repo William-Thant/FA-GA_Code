@@ -971,6 +971,8 @@ app.post('/seller/add-vehicle', checkAuthenticated, checkSeller, upload.single('
 app.post('/seller/update-profile', checkAuthenticated, checkSeller, SellerController.updateProfile);
 app.post('/seller/vehicle/:id/delete', checkAuthenticated, checkSeller, SellerController.deleteVehicle);
 app.post('/seller/vehicle/:id/mark-sold', checkAuthenticated, checkSeller, SellerController.markAsSold);
+app.get('/seller/vehicle/:id/edit', checkAuthenticated, checkSeller, SellerController.showEditVehicleForm);
+app.post('/seller/vehicle/:id/edit', checkAuthenticated, checkSeller, upload.single('image'), SellerController.updateVehicle);
 
 // Admin user management routes
 app.post('/admin/toggle-role', checkAuthenticated, checkAdmin, (req, res) => {
@@ -1811,21 +1813,38 @@ app.post('/deleteProduct/:id/confirm', checkAuthenticated, checkAdmin, (req, res
         VALUES (?, ?, ?, ?, NOW())
     `;
 
-    connection.query(logSql, [productId, req.session.user.userId, reason, details || null], (logError) => {
-        if (logError) {
-            console.error('Error logging deletion:', logError);
-            // Continue with deletion even if logging fails
-        }
+        connection.query(logSql, [productId, req.session.user.userId, reason, details || null], (logError) => {
+            if (logError) {
+                console.error('Error logging deletion:', logError);
+                // Continue with deletion even if logging fails
+            }
 
-        // Now delete the product
-        connection.query('DELETE FROM products WHERE id = ?', [productId], (error, results) => {
-            if (error) {
-                console.error("Error deleting product:", error);
-                req.flash('error', 'Error deleting product');
+        // Remove dependent rows first to satisfy FK constraints
+        connection.query('DELETE FROM refund_requests WHERE product_id = ?', [productId], (refundErr) => {
+            if (refundErr) {
+                console.error("Error deleting refund requests:", refundErr);
+                req.flash('error', 'Error deleting product refunds');
                 return res.redirect('/inventory');
             }
-            req.flash('success', 'Product deleted successfully');
-            res.redirect('/inventory');
+
+            connection.query('DELETE FROM vehicle_views WHERE vehicle_id = ?', [productId], (viewsErr) => {
+                if (viewsErr) {
+                    console.error("Error deleting vehicle view analytics:", viewsErr);
+                    req.flash('error', 'Error deleting product analytics');
+                    return res.redirect('/inventory');
+                }
+
+                // Now delete the product
+                connection.query('DELETE FROM products WHERE id = ?', [productId], (error, results) => {
+                    if (error) {
+                        console.error("Error deleting product:", error);
+                        req.flash('error', 'Error deleting product');
+                        return res.redirect('/inventory');
+                    }
+                    req.flash('success', 'Product deleted successfully');
+                    res.redirect('/inventory');
+                });
+            });
         });
     });
 });

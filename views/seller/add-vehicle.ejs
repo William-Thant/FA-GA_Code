@@ -154,8 +154,20 @@
 
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-plus-circle"></i> Add New Vehicle</h1>
-            <p class="mb-0">List a new vehicle for sale</p>
+            <h1>
+                <% if (isEdit) { %>
+                    <i class="fas fa-edit"></i> Edit Vehicle
+                <% } else { %>
+                    <i class="fas fa-plus-circle"></i> Add New Vehicle
+                <% } %>
+            </h1>
+            <p class="mb-0">
+                <% if (isEdit) { %>
+                    Update your vehicle listing details
+                <% } else { %>
+                    List a new vehicle for sale
+                <% } %>
+            </p>
         </div>
     </div>
 
@@ -163,26 +175,27 @@
         <%- include('../partials/messages') %>
 
         <div class="form-card">
-            <form action="/seller/add-vehicle" method="POST" enctype="multipart/form-data">
+            <form action="<%= isEdit ? '/seller/vehicle/' + vehicle.id + '/edit' : '/seller/add-vehicle' %>" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="productName" class="form-label">Vehicle Name <span class="required">*</span></label>
                         <input type="text" class="form-control" id="productName" name="productName" 
-                               placeholder="e.g., 2024 Tesla Model 3" required>
+                               placeholder="e.g., 2024 Tesla Model 3" required
+                               value="<%= vehicle ? vehicle.productName : '' %>">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="category" class="form-label">Category <span class="required">*</span></label>
                         <select class="form-select" id="category" name="category" required>
                             <option value="">Select Category</option>
-                            <option value="Sedan">Sedan</option>
-                            <option value="SUV">SUV</option>
-                            <option value="Truck">Truck</option>
-                            <option value="Sports Car">Sports Car</option>
-                            <option value="Electric">Electric</option>
-                            <option value="Hybrid">Hybrid</option>
-                            <option value="Luxury">Luxury</option>
-                            <option value="Van">Van</option>
+                            <option value="Sedan" <%= vehicle && vehicle.category === 'Sedan' ? 'selected' : '' %>>Sedan</option>
+                            <option value="SUV" <%= vehicle && vehicle.category === 'SUV' ? 'selected' : '' %>>SUV</option>
+                            <option value="Truck" <%= vehicle && vehicle.category === 'Truck' ? 'selected' : '' %>>Truck</option>
+                            <option value="Sports Car" <%= vehicle && vehicle.category === 'Sports Car' ? 'selected' : '' %>>Sports Car</option>
+                            <option value="Electric" <%= vehicle && vehicle.category === 'Electric' ? 'selected' : '' %>>Electric</option>
+                            <option value="Hybrid" <%= vehicle && vehicle.category === 'Hybrid' ? 'selected' : '' %>>Hybrid</option>
+                            <option value="Luxury" <%= vehicle && vehicle.category === 'Luxury' ? 'selected' : '' %>>Luxury</option>
+                            <option value="Van" <%= vehicle && vehicle.category === 'Van' ? 'selected' : '' %>>Van</option>
                         </select>
                     </div>
                 </div>
@@ -191,13 +204,15 @@
                     <div class="col-md-6 mb-3">
                         <label for="price" class="form-label">Price (SGD) <span class="required">*</span></label>
                         <input type="number" class="form-control" id="price" name="price" 
-                               placeholder="e.g., 45000" step="0.01" min="0" required>
+                               placeholder="e.g., 45000" step="0.01" min="0" required
+                               value="<%= vehicle ? vehicle.price : '' %>">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="quantity" class="form-label">Stock Quantity <span class="required">*</span></label>
                         <input type="number" class="form-control" id="quantity" name="quantity" 
-                               placeholder="e.g., 1" min="0" required>
+                               placeholder="e.g., 1" min="0" required
+                               value="<%= vehicle ? vehicle.quantity : '' %>">
                     </div>
                 </div>
 
@@ -205,13 +220,15 @@
                     <div class="col-md-6 mb-3">
                         <label for="mileage" class="form-label">Mileage (Miles)</label>
                         <input type="number" class="form-control" id="mileage" name="mileage" 
-                               placeholder="e.g., 45000" min="0" step="1">
+                               placeholder="e.g., 45000" min="0" step="1"
+                               value="<%= vehicle && vehicle.mileage ? vehicle.mileage : '' %>">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="year" class="form-label">Year</label>
                         <input type="number" class="form-control" id="year" name="year" 
-                               placeholder="e.g., 2024" min="1900" max="2100">
+                               placeholder="e.g., 2024" min="1900" max="2100"
+                               value="<%= vehicle && vehicle.year ? vehicle.year : '' %>">
                     </div>
                 </div>
 
@@ -225,11 +242,14 @@
                             <small class="d-block mt-2">Maximum file size: 5MB</small>
                         </label>
                     </div>
+                    <% if (isEdit && vehicle && vehicle.image) { %>
+                        <small class="d-block mt-2 text-muted">Current image: <%= vehicle.image %></small>
+                    <% } %>
                 </div>
 
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-submit me-3">
-                        <i class="fas fa-check"></i> Add Vehicle
+                        <i class="fas fa-check"></i> <%= isEdit ? 'Save Changes' : 'Add Vehicle' %>
                     </button>
                     <a href="/seller/dashboard" class="btn btn-cancel">
                         <i class="fas fa-times"></i> Cancel
